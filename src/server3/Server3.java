@@ -1,11 +1,12 @@
-package server;
+package server3;
 
 import java.util.ArrayList;
 
-public class Server2 {
+public class Server3 {
 
-	public static int PORT = 6789;
+	public static int PORT = 9999;
 	public static String IP = "172.20.10.2";
+	public static String serverName = "server3";
 	public int appliancePowerProfile[][];
 	public double appliancePowerConsumption[];
 	public String serverDetails[][];
@@ -16,7 +17,8 @@ public class Server2 {
 	public int startOfTenth = 0;
 	public int endOfTenth = 0;
 	public int totalIteration = 1;
-	public Server2() {
+	
+	public Server3() {
 		 appliancePowerProfile  = new int[][] {
 				{1 ,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 				{1 ,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -35,8 +37,8 @@ public class Server2 {
 		 appliancePowerConsumption = new double[] { 0.07, 0.05, 0.1, 0.15, 1.6, 1.5, 2.5, 0.3, 0.04, 2, 1.8 };
 	
 		 serverDetails = new String[][] {
-			 {"serverno","ip","port"},
-			 {"serverno","ip","port"},
+			 {"server1","172.20.10.2","6789","false"},
+			 {"server2","172.20.10.2","8888","false"},
 			 
 		 };
 		 aggregatePowerProfile = new double[] 
@@ -79,12 +81,11 @@ public class Server2 {
 	}
 	
 	public static void main(String[] args) {
-		 System.out.println("Server 1");
-		 Server1 s = new Server1();
+		 System.out.println("Server 3");
 		 
-		 Thread a = new Thread(new ServerRequest(s));
+		 Thread a = new Thread(new ServerRequest());
 		 a.start();
-		 Thread b = new Thread(new ClientRequest(s));
+		 Thread b = new Thread(new ClientRequest());
 		 b.start();
 		 
 	}

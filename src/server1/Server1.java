@@ -1,11 +1,13 @@
-package server;
+package server1;
 
 import java.util.ArrayList;
 
+
 public class Server1 {
 
-	public static int PORT = 6789;
-	public static String IP = "172.20.10.2";
+	public  int PORT = 6789;
+	public  String IP = "172.20.10.2";
+	public static String serverName = "server1";
 	public int appliancePowerProfile[][];
 	public double appliancePowerConsumption[];
 	public String serverDetails[][];
@@ -35,8 +37,8 @@ public class Server1 {
 		 appliancePowerConsumption = new double[] { 0.07, 0.05, 0.1, 0.15, 1.6, 1.5, 2.5, 0.3, 0.04, 2, 1.8 };
 	
 		 serverDetails = new String[][] {
-			 {"serverno","ip","port"},
-			 {"serverno","ip","port"},
+			 {"server2","172.20.10.2","8888","false","0"},
+			 {"server3","172.20.10.2","9999","false","0"},
 			 
 		 };
 		 aggregatePowerProfile = new double[] 
@@ -80,11 +82,10 @@ public class Server1 {
 	
 	public static void main(String[] args) {
 		 System.out.println("Server 1");
-		 Server1 s = new Server1();
 		 
-		 Thread a = new Thread(new ServerRequest(s));
+		 Thread a = new Thread(new ServerRequest());
 		 a.start();
-		 Thread b = new Thread(new ClientRequest(s));
+		 Thread b = new Thread(new ClientRequest());
 		 b.start();
 		 
 	}
