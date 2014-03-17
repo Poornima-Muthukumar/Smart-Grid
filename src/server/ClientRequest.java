@@ -1,16 +1,18 @@
-package server3;
+package server;
 import java.io.*;
 import java.net.*;
+
+import server.Server;
+
 
 
 public class ClientRequest implements Runnable{
 
 	
-	public Server3 server;
+	public Server server;
 	
 	public ClientRequest() {
-			server = new Server3();
-
+			server = new Server();
 	}
 
 	
@@ -24,7 +26,8 @@ public void requestIteration() throws NumberFormatException, UnknownHostExceptio
 	         clientSocket = new Socket(server.serverDetails[i][1], Integer.parseInt(server.serverDetails[i][2]));
 	         server.serverDetails[i][3] = "true";
 	         i++;
-			 } else {
+			 }
+			 else {
 				 i++;
 				 continue;
 			 }

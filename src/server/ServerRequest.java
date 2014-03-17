@@ -1,17 +1,17 @@
-package server3;
+package server;
 import java.io.*;
 import java.net.*;
 
-import server1.Server1;
+import server.Server;
 import server2.Server2;
 import server3.Server3;
 
 public class ServerRequest implements Runnable {
 
-	public Server3 server;
+	public Server server;
 	
 	public ServerRequest() {
-			server = new Server3();	
+			server = new Server();	
 	}
 
 	public void acceptRequest() throws IOException {
