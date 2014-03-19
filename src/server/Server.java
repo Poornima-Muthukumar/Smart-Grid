@@ -16,7 +16,7 @@ public class Server {
 	public static int appliancePowerProfile[][];
 	public static double appliancePowerConsumption[];
 	public int timeConstraints[][];
-	public double aggregatePowerProfile[];
+	public double[][] aggregatePowerProfile;
 	public static int startOfNinth = 0;
 	public static int endOfNinth = 0;
 	public static int startOfTenth = 0;
@@ -37,18 +37,16 @@ public class Server {
 		 details = new HashMap<String, ArrayList<String>>();
 		 
 		 ArrayList<String> value1 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.244","6789","false","0"));
+				    Arrays.asList("172.23.189.244","6789","false","0","0"));
 		 ArrayList<String> value2 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.244","8888","false","0"));
+				    Arrays.asList("172.23.189.244","8888","false","0","0"));
 		 ArrayList<String> value3 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.244","9999","false","0"));
+				    Arrays.asList("172.23.189.244","9999","false","0","0"));
 		 
 		 details.put("server1", value1);
 		 details.put("server2", value2);
 		 details.put("server3", value3);
-		 
-		 aggregatePowerProfile = new double[] 
-			 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 		 
 		 //startOfNinth = 7;
 		 //endOfNinth = 18;
@@ -63,33 +61,126 @@ public class Server {
 	}
 	
 	
-	public void calculateAggregatePowerProfile() {
-		
-		for(int i=0; i < appliancePowerProfile[0].length; i++) {
-			double aggregateSum = 0;
-			for(int j=0; j< appliancePowerProfile.length;j++) {
-				aggregateSum += appliancePowerProfile[j][i] * appliancePowerConsumption[j];
-			}
-			aggregatePowerProfile[i] = aggregateSum;
+	public void calculateAggregatePowerProfile(int iterationCount) {
+			
+		aggregatePowerProfile = new double[iterationCount][];
+	
+		for(int i=0;i<iterationCount;i++) {
+			aggregatePowerProfile[i] = new double[24];
 		}
+		
+		int sumOfNinth = 0;
+		int sumOfTenth = 0;
+		 
+		for(int i=0;i<24;i++) {
+				sumOfNinth+=appliancePowerProfile[9][i];
+				sumOfTenth+=appliancePowerProfile[10][i];
+			}
+		
+		
+		int iterationForNinth = (endOfNinth - startOfNinth) - sumOfNinth +2; 
+		int iterationForTenth = (endOfTenth - startOfTenth) - sumOfTenth +2; 
+		
+		int startIndexNinth = startOfNinth;
+		
+		int ninthPowerProfile[][] = new int[iterationForNinth][24];
+		
+		
+		for(int i=0;i<iterationForNinth;i++) {
+			ninthPowerProfile[i] = new int[24];
+			for(int j=0;j<24;j++) {
+				
+				
+				if(j>=startIndexNinth && j<startIndexNinth+sumOfNinth) {
+					ninthPowerProfile[i][j] = 1;
+					
+				} else {
+					ninthPowerProfile[i][j] = 0;
+					
+				}	
+			}
+			
+			System.out.println(Arrays.toString(ninthPowerProfile[i]));
+			startIndexNinth++;
+		}
+		
+		
+		
+		int tenthPowerProfile[][] = new int[iterationForTenth][24];
+		
+		
+		int startIndexTenth = startOfTenth;
+		for(int i=0;i<iterationForTenth;i++) {
+			
+			tenthPowerProfile[i] = new int[24];
+			for(int j=0;j<24;j++) {
+				
+				
+				if(j>=startIndexTenth && j<startIndexTenth+sumOfTenth) {
+					tenthPowerProfile[i][j] = 1;
+					
+				} else {
+					tenthPowerProfile[i][j] = 0;
+					
+				}
+				
+			}
+			
+			System.out.println(Arrays.toString(tenthPowerProfile[i]));
+			startIndexTenth++;
+		}
+		
+		
+		
+		int speedOfNinth = (iterationForNinth*iterationForTenth)/iterationForNinth;
+		int speedOfTenth = 1;
+		
+
+		int profileIndex9 = 0;
+		int profileIndex10 = 0;
+		System.out.println(iterationForNinth*iterationForTenth + " " + iterationCount);
+		for(int i=0;i<iterationForNinth*iterationForTenth;i++) {
+			if(i%speedOfNinth == 0 && i!=0) {
+				profileIndex9++;
+			} 
+			if(i%speedOfTenth == 0 && i!=0) {
+				profileIndex10++;
+			}
+			appliancePowerProfile[9] = ninthPowerProfile[profileIndex9%iterationForNinth];
+			appliancePowerProfile[10] = tenthPowerProfile[profileIndex10%iterationForTenth];
+					
+			
+			for(int k=0; k < appliancePowerProfile[0].length; k++) {
+				double aggregateSum = 0;
+				for(int j=0; j< appliancePowerProfile.length;j++) {
+					aggregateSum += appliancePowerProfile[j][k] * appliancePowerConsumption[j];
+				}
+				aggregatePowerProfile[i][k] = aggregateSum;
+			}
+			
+			System.out.println(Arrays.toString(aggregatePowerProfile[i]));
+			
+		}
+		
+	
 	}
 	
 	public int calculateIterationRound() {
 		
 		int sumOfNinth = 0;
 		int sumOfTenth = 0;
-		
+		 
 		for(int i=0;i<24;i++) {
-			sumOfNinth+=appliancePowerProfile[9][i];
-			sumOfTenth+=appliancePowerProfile[10][i];
-		}
+				sumOfNinth+=appliancePowerProfile[9][i];
+				sumOfTenth+=appliancePowerProfile[10][i];
+			}
 		
-		int iteration = 0;
+		int iteration = 1;
 		
 		int dif1 = (endOfNinth > startOfNinth ) ? endOfNinth - startOfNinth : startOfNinth%12 + endOfNinth;
 		int dif2 = (endOfTenth > startOfTenth ) ? endOfTenth - startOfTenth : startOfTenth%12 + endOfTenth;
-		iteration += (dif1 - sumOfNinth) + 2;
-		iteration += (dif2 - sumOfTenth) + 2;
+		iteration *= (dif1 - sumOfNinth) + 2;
+		iteration *= (dif2 - sumOfTenth) + 2;
 		
 		return iteration;
 	}
@@ -162,5 +253,18 @@ public class Server {
 		 b.start();
 		 
 	}
-	
+
+
+	public void calcluateServerSpeed(String serverName) {
+		if(serverName == "server1") {
+			details.get(serverName).set(4,Integer.toString(totalIteration/Integer.parseInt(details.get(serverName).get(3))));
+		}
+		else if(serverName == "server2") {
+			int denom = Integer.parseInt(details.get(serverName).get(3)) * Integer.parseInt(details.get("server1").get(3));
+			details.get(serverName).set(4,Integer.toString(totalIteration/denom));
+		}
+		else if(serverName == "server3") {
+			details.get(serverName).set(4,"1");
+		}
+	}	
 }

@@ -20,13 +20,14 @@ public void requestIteration() throws NumberFormatException, UnknownHostExceptio
 		
 		
 	   Set<String> name = server.details.keySet();
-	   name.remove(serverName);
 	   System.out.println("name array"+name);
 	   String[] nameArray = new String[2];
 	   int j=0;
 	   for(String val: name) {
+		   if(!val.equals(serverName)) {
 		   nameArray[j] = val;
 		   j++;
+		   }
 	   }
 	   
 		int i = 0;
@@ -52,6 +53,7 @@ public void requestIteration() throws NumberFormatException, UnknownHostExceptio
 				        String input = inFromServer.readLine();
 				        System.out.println("FROM SERVER: " + input);
 				        String[] result = input.split(":");
+				        server.details.get(result[0]).set(3, result[1]);
 				        server.totalIteration *= Integer.parseInt(result[1]);
 				        System.out.println(server.totalIteration);
 				        clientSocket.close();
@@ -80,17 +82,27 @@ public void requestIteration() throws NumberFormatException, UnknownHostExceptio
 	public void run() {
         System.out.println("Hello from client thread!");  
         try {
+        	
+        	//Step1 - request iteration from other servers.
 			requestIteration();
-			server.totalIteration*=server.calculateIterationRound();
+			int selfCount = server.calculateIterationRound();
+			server.totalIteration*=selfCount;
+			server.details.get(serverName).set(3, Integer.toString(selfCount));
+			
+			// calcuate aggregate power profile for different appliance configuation for each server. 
+			server.calculateAggregatePowerProfile(selfCount);
+			
+			//calculate individual speed.
+			server.calcluateServerSpeed(serverName);
 	        System.out.println("TOTAL ITER"+server.totalIteration);
+	        
+	        //calculate total power profile of the system.
+	        
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
