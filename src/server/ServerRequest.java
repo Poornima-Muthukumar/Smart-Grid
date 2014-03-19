@@ -3,22 +3,24 @@ import java.io.*;
 import java.net.*;
 
 import server.Server;
-import server2.Server2;
-import server3.Server3;
+
 
 public class ServerRequest implements Runnable {
 
 	public Server server;
+	public String serverName;
 	
-	public ServerRequest() {
-			server = new Server();	
+	public ServerRequest(String name) {
+			server = new Server();
+			serverName = name;
 	}
 
 	public void acceptRequest() throws IOException {
 		
 		String clientSentence;
-	    ServerSocket welcomeSocket = new ServerSocket(server.PORT); 
-	    System.out.println(server.PORT);
+		int port = Integer.parseInt(server.details.get(serverName).get(1));
+	    ServerSocket welcomeSocket = new ServerSocket(port); 
+	    System.out.println(port);
 	    
 		while(true) {
 	            Socket connectionSocket = welcomeSocket.accept();
@@ -39,7 +41,7 @@ public class ServerRequest implements Runnable {
 	            if(clientSentence.contentEquals("iteration")) {
 	            	int iteration = server.calculateIterationRound();
 	            	System.out.println("self iteration" +iteration);
-	            	outToClient.writeBytes(server.serverName+":"+iteration+'\n');
+	            	outToClient.writeBytes(serverName+":"+iteration+'\n');
 	            	
 	            } else if(clientSentence.startsWith("request")) {
 	            	// return iteration 
@@ -56,8 +58,7 @@ public class ServerRequest implements Runnable {
         try {
 			acceptRequest();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("failed to accept request");
 		}
         
     }

@@ -3,31 +3,43 @@ package server;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Server {
 
 	public static int appliancePowerProfile[][];
 	public static double appliancePowerConsumption[];
-	public String serverDetails[][];
 	public int timeConstraints[][];
 	public double aggregatePowerProfile[];
-	public int startOfNinth = 0;
-	public int endOfNinth = 0;
-	public int startOfTenth = 0;
-	public int endOfTenth = 0;
+	public static int startOfNinth = 0;
+	public static int endOfNinth = 0;
+	public static int startOfTenth = 0;
+	public static int endOfTenth = 0;
 	public int totalIteration = 1;
+	public Map<String,ArrayList<String>> details;
+	
 	public Server() {
 		 appliancePowerProfile  = new int[][] {	}; 
 	
 		 appliancePowerConsumption = new double[] {};
 	
-		 serverDetails = new String[][] {
-			 {"server1","172.20.10.2","6789","flase","0"},		
-			 {"server2","172.20.10.2","8888","false","0"},
-			 {"server3","172.20.10.2","9999","false","0"},
-			 
-		 };
+		 details = new HashMap<String, ArrayList<String>>();
+		 
+		 ArrayList<String> value1 = new ArrayList<String>(
+				    Arrays.asList("172.20.10.2","6789","false","0"));
+		 ArrayList<String> value2 = new ArrayList<String>(
+				    Arrays.asList("172.20.10.2","8888","false","0"));
+		 ArrayList<String> value3 = new ArrayList<String>(
+				    Arrays.asList("172.20.10.2","9999","false","0"));
+		 
+		 details.put("server1", value1);
+		 details.put("server2", value2);
+		 details.put("server3", value3);
+		 
 		 aggregatePowerProfile = new double[] 
 			 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		 
@@ -66,8 +78,11 @@ public class Server {
 		}
 		
 		int iteration = 0;
-		iteration += ((endOfNinth - startOfNinth) - sumOfNinth) + 2;
-		iteration += ((endOfTenth - startOfTenth) - sumOfTenth) + 2;
+		
+		int dif1 = (endOfNinth > startOfNinth ) ? endOfNinth - startOfNinth : startOfNinth%12 + endOfNinth;
+		int dif2 = (endOfTenth > startOfTenth ) ? endOfTenth - startOfTenth : startOfTenth%12 + endOfTenth;
+		iteration += (dif1 - sumOfNinth) + 2;
+		iteration += (dif2 - sumOfTenth) + 2;
 		
 		return iteration;
 	}
@@ -123,9 +138,14 @@ public class Server {
 			}
 		 }
 		 
-		 Thread a = new Thread(new ServerRequest());
+		 startOfNinth = Integer.parseInt(args[1]);
+		 endOfNinth = Integer.parseInt(args[2]);
+		 startOfTenth = Integer.parseInt(args[3]);
+		 endOfTenth = Integer.parseInt(args[4]);
+		 
+		 Thread a = new Thread(new ServerRequest(args[0]));
 		 a.start();
-		 Thread b = new Thread(new ClientRequest());
+		 Thread b = new Thread(new ClientRequest(args[0]));
 		 b.start();
 		 
 	}
