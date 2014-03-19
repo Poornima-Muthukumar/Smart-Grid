@@ -1,6 +1,7 @@
 package server;
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 
 import server.Server;
 
@@ -10,8 +11,8 @@ public class ServerRequest implements Runnable {
 	public Server server;
 	public String serverName;
 	
-	public ServerRequest(String name) {
-			server = new Server();
+	public ServerRequest(String name, Server serverObj) {
+			server = serverObj;
 			serverName = name;
 	}
 

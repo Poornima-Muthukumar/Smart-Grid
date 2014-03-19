@@ -3,6 +3,8 @@ package server;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,18 +25,23 @@ public class Server {
 	public Map<String,ArrayList<String>> details;
 	
 	public Server() {
-		 appliancePowerProfile  = new int[][] {	}; 
+		 appliancePowerProfile  = new int[11][];
+		 
+		 for(int i=0;i<11;i++) {
+			 appliancePowerProfile[i] = new int[]
+					 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		 }
 	
-		 appliancePowerConsumption = new double[] {};
+		 appliancePowerConsumption = new double[11];
 	
 		 details = new HashMap<String, ArrayList<String>>();
 		 
 		 ArrayList<String> value1 = new ArrayList<String>(
-				    Arrays.asList("172.20.10.2","6789","false","0"));
+				    Arrays.asList("172.23.189.244","6789","false","0"));
 		 ArrayList<String> value2 = new ArrayList<String>(
-				    Arrays.asList("172.20.10.2","8888","false","0"));
+				    Arrays.asList("172.23.189.244","8888","false","0"));
 		 ArrayList<String> value3 = new ArrayList<String>(
-				    Arrays.asList("172.20.10.2","9999","false","0"));
+				    Arrays.asList("172.23.189.244","9999","false","0"));
 		 
 		 details.put("server1", value1);
 		 details.put("server2", value2);
@@ -89,13 +96,14 @@ public class Server {
 	
 	public static void loadFromFile(String fileName) throws IOException {
 		
-		  BufferedReader br = new BufferedReader(new FileReader(fileName));
+		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		    try {
 		        String line = br.readLine();
+		        System.out.println(line);
                 int lineCount = 0;
 		        while (line != null) {
 		        	String[] result = line.split(",");
-		        	
+
 		        	if(lineCount == 11) {
 		        		
 		        		for(int j =0; j<result.length; j++) {
@@ -103,7 +111,7 @@ public class Server {
 			        	}
 			        	
 		        	} else {
-			        	for(int j =0; j<result.length; j++) {
+			        	for(int j=0; j<result.length; j++) {
 			        		appliancePowerProfile[lineCount][j] = Integer.parseInt(result[j]);
 			        	}
 		        	}
@@ -118,34 +126,39 @@ public class Server {
 	public static void main(String[] args) {
 		 //.out.println("Server 1");
 		 
-		 if(args[0] == "server1") {
+		Server serverObj =  new Server();
+		
+		String serverName = args[0];
+		
+		if(serverName.equals("server1")) {
 			try {
-				loadFromFile("serverOneDetails");
+				Server.loadFromFile("serverOneDetails");
 			} catch (IOException e) {
 				System.out.println("Error reading file");
 			} 	
-		 } else if(args[0] == "server2") {
+		 } else if(serverName.equals("server2")) {
 			 try {
-				loadFromFile("serverTwoDetails");
+				 Server.loadFromFile("serverTwoDetails");
 			} catch (IOException e) {
 				System.out.println("Error reading file");
 			}
-		 } else if(args[0] == "server3") {
+		 } else if(serverName.equals("server3")) {
 			 try {
-				loadFromFile("serverThreeDetails");
+				 Server.loadFromFile("serverThreeDetails");
 			} catch (IOException e) {
 				System.out.println("Error reading file");
 			}
 		 }
-		 
+		
+		
 		 startOfNinth = Integer.parseInt(args[1]);
 		 endOfNinth = Integer.parseInt(args[2]);
 		 startOfTenth = Integer.parseInt(args[3]);
 		 endOfTenth = Integer.parseInt(args[4]);
 		 
-		 Thread a = new Thread(new ServerRequest(args[0]));
+		 Thread a = new Thread(new ServerRequest(args[0],serverObj));
 		 a.start();
-		 Thread b = new Thread(new ClientRequest(args[0]));
+		 Thread b = new Thread(new ClientRequest(args[0],serverObj));
 		 b.start();
 		 
 	}
