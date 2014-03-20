@@ -36,6 +36,10 @@ public class ServerRequest implements Runnable {
 	                    new DataOutputStream(
 	                        connectionSocket.getOutputStream());
 	            
+	          //output stream
+	        	ObjectOutputStream outputStream = new ObjectOutputStream(
+	        			connectionSocket.getOutputStream());
+	            
 	            clientSentence = inFromClient.readLine();
 	            System.out.println("clientSentence" + clientSentence);
 	            
@@ -44,8 +48,19 @@ public class ServerRequest implements Runnable {
 	            	System.out.println("self iteration" +iteration);
 	            	outToClient.writeBytes(serverName+":"+iteration+'\n');
 	            	
-	            } else if(clientSentence.startsWith("request")) {
-	            	// return iteration 
+	            } else if(clientSentence.contains("request")) {
+	            	// return iteration
+	            	 String[] result = clientSentence.split(":");
+	            	 int iteration =  Integer.parseInt(result[2]);
+	            	 int index = iteration % Integer.parseInt(server.details.get(result[0]).get(4));
+	            	 
+	            	 index = index%server.aggregatePowerProfile.length;
+	            	 
+	            	 double[] response = server.aggregatePowerProfile[index];
+	            	 
+	            	 DataObject obj = new DataObject(serverName, response);
+	            	 outputStream.writeObject(obj);
+	            	 
 	            }
 	            
 	        }

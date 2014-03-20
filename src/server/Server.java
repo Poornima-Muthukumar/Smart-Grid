@@ -24,6 +24,13 @@ public class Server {
 	public int totalIteration = 1;
 	public Map<String,ArrayList<String>> details;
 	
+
+	// final decision.
+	public double[] minimumAggregatePowerValue;
+	public double[][] mimimumAggregatePowerProfile;
+	public double PAR;
+	
+	
 	public Server() {
 		 appliancePowerProfile  = new int[11][];
 		 
@@ -266,5 +273,25 @@ public class Server {
 		else if(serverName == "server3") {
 			details.get(serverName).set(4,"1");
 		}
-	}	
+	}
+
+
+	public void calculatePAR() {
+		
+		double max = 0;
+		double sum = 0;
+		for(int i=0;i<24;i++) {
+		
+			if(minimumAggregatePowerValue[i] > max) {
+				max = minimumAggregatePowerValue[i];
+			}
+			sum+=minimumAggregatePowerValue[i];
+		}
+		double average = sum/24;
+		double currentPAR = max/average;
+		if (currentPAR < PAR) {
+			PAR = currentPAR;
+			
+		}
+	}
 }
