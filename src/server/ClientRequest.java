@@ -1,9 +1,9 @@
 package server;
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
-
-import javax.swing.text.html.MinimalHTMLWriter;
 
 import server.Server;
 
@@ -24,7 +24,6 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 		
 		
 	   Set<String> name = server.details.keySet();
-	   System.out.println("name array"+name);
 	   String[] nameArray = new String[2];
 	   int j=0;
 	   for(String val: name) {
@@ -34,56 +33,61 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 		   }
 	   }
 	   
+	   System.out.println(Arrays.toString(nameArray) + request);
+	   
 		int i = 0;
 		Socket clientSocket = null; 
 		while(true) {
 				
-				 if(server.details.get(nameArray[i]).get(2) == "false") {	
+				 if(server.details.get(nameArray[i]).get(2).equals("false")) {	
 					 
 					 try{
-						 
-						 System.out.println("before connect"+server.details.get(nameArray[i]).get(0)+server.details.get(nameArray[i]).get(1));
 				         clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
 				         server.details.get(nameArray[i]).set(2, "true");
-				         
-				         
-				        
+				            
 				        if(request.equals("iteration")) {
-				        DataOutputStream outToServer = new DataOutputStream(
-					                clientSocket.getOutputStream());
-					        
-					     BufferedReader inFromServer = 
-					                new BufferedReader(new InputStreamReader(
-					                    clientSocket.getInputStream()));
-					        
-				        outToServer.writeBytes(request+"\n");
-				        String input = inFromServer.readLine();
-				        System.out.println("FROM SERVER: " + input);
-				        
-					        String[] result = input.split(":");
-					        server.details.get(result[0]).set(3, result[1]);
+					        DataOutputStream outToServer = new DataOutputStream(
+						                clientSocket.getOutputStream());
+						        
+						     BufferedReader inFromServer = 
+						                new BufferedReader(new InputStreamReader(
+						                    clientSocket.getInputStream()));
+						        
+					        outToServer.writeBytes(request+"\n");
+					        String input = inFromServer.readLine();
+					              
+				        	String[] result = input.split(":");
+					        server.details.get(result[0]).set(3, result[1]);   
 					        server.totalIteration *= Integer.parseInt(result[1]);
-					        System.out.println(server.totalIteration);
 					        clientSocket.close();
 				        }
+				        
 				        else if(request.contains("request")){
 				        	
 				        	//output stream
-				        	ObjectOutputStream outputStream = new ObjectOutputStream(
-				        			clientSocket.getOutputStream());
+				        	DataOutputStream outToServer = new DataOutputStream(
+					                clientSocket.getOutputStream());
 				        	
 				        	//input stream
 				        	ObjectInputStream inputStream = new ObjectInputStream(
 				        			clientSocket.getInputStream());
 				        	
-				        	outputStream.writeObject(request);
-				        	DataObject obj = (DataObject)inputStream.readObject();
+				        	outToServer.writeBytes(request+"\n");
 				        	
+				        	
+				        	DataObject obj = (DataObject)inputStream.readObject();
+				        	System.out.println("after"+obj);
+				        	
+				        	clientSocket.close();
+				        	
+				        	/*
 				        	if(server1Obj.length == 0) {
 				        		server1Obj = obj.arrayValue;
+				        		System.out.println(server1Obj);
 				        	} else {
 				        		server2Obj = obj.arrayValue;
-				        	}
+				        		System.out.println(server2Obj);
+				        	}*/
 				        }
 					}
 					 catch(IOException e) {
@@ -112,6 +116,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 		int arrayIndex = 0;
 		int totalIter = server.totalIteration;
 		for(int j=0;j<totalIter;j++) {
+			
 			if(j%Integer.parseInt(server.details.get(serverName).get(4)) == 0 && j!=0) {
 				arrayIndex++;
 			}
@@ -124,47 +129,122 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 			for(String n : name) {
 				server.details.get(n).set(2, "false");
 			}
-			
+					
 			try {
 				setUpConnection(serverName+":request:"+j);
 			} catch (Exception e) {
 				System.out.println("failed to create connection");
 			}
 			
-			
+			/*
 			server.minimumAggregatePowerValue = new double[24];
 			
 			for(int i=0;i<24;i++) {
 				server.minimumAggregatePowerValue[i] = value[i] + server1Obj[i] + server2Obj[i];
 			}
+			System.out.println(Arrays.toString(server.minimumAggregatePowerValue));
 			
 			server.calculatePAR();
-			
+			*/
 			
 		}
 		
 	}
 	
+
+	public void checkStatus() {
+	
+		
+		Set<String> name = server.details.keySet();
+		   String[] nameArray = new String[2];
+		   int j=0;
+		   for(String val: name) {
+			   if(!val.equals(serverName)) {
+			   nameArray[j] = val;
+			   j++;
+			   }
+		   }
+		   		   
+			int i = 0;
+			Socket clientSocket = null; 
+			while(true) {
+					
+					 if(server.details.get(nameArray[i]).get(2).equals("false") || server.details.get(nameArray[i]).get(4).equals("0")) {	
+						 
+						 try{
+					         clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
+					         server.details.get(nameArray[i]).set(2, "true");
+	 
+						        DataOutputStream outToServer = new DataOutputStream(
+							                clientSocket.getOutputStream());
+							        
+							     BufferedReader inFromServer = 
+							                new BufferedReader(new InputStreamReader(
+							                    clientSocket.getInputStream()));
+							        
+						        outToServer.writeBytes("speed\n");
+						        String input = inFromServer.readLine();
+						              
+					        	String[] result = input.split(":");
+						        server.details.get(result[0]).set(4, result[1]);     
+						        clientSocket.close();
+					        }		     
+						 catch(IOException e) {
+							 i++;
+							 if(i==2) {
+								 i=0;
+							 }
+							 System.out.println("OH NOES");
+							 continue;
+						 }
+					 }
+					 i++;
+					 if(server.details.get(nameArray[1]).get(2).equals("true") && server.details.get(nameArray[0]).get(2).equals("true") &&
+							 !server.details.get(nameArray[1]).get(4).equals("0") && !server.details.get(nameArray[0]).get(4).equals("0")) {
+						 break;
+					 }
+					 else {
+						 if(i==2) {
+							 i = 0;
+						 }
+					 }
+			}
+		
+	}
+	
 	public void run() {
-        System.out.println("Hello from client thread!");  
+       System.out.println("Hello from client thread!");  
         try {
         	
         	//Step1 - request iteration from other servers.
-			setUpConnection("iteration");
-			int selfCount = server.calculateIterationRound();
+        	int selfCount = server.calculateIterationRound();
 			server.totalIteration*=selfCount;
 			server.details.get(serverName).set(3, Integer.toString(selfCount));
-			
-			// calcuate aggregate power profile for different appliance configuation for each server. 
+		     
+		    // calcuate aggregate power profile for different appliance configuation for each server. 
 			server.calculateAggregatePowerProfile(selfCount);
+			
+			setUpConnection("iteration");
+							
+		    System.out.println("TOTAL ITER"+server.totalIteration);   
 			
 			//calculate individual speed.
 			server.calcluateServerSpeed(serverName);
-	        System.out.println("TOTAL ITER"+server.totalIteration);
-	        
-	        
+	       
+			
+			Set<String> name = server.details.keySet();
+			for(String n : name) {
+				server.details.get(n).set(2, "false");
+			}
+			
+			checkStatus();
+
+	        for (Map.Entry entry : server.details.entrySet()) {
+        	    System.out.println(entry.getKey() + ", " + entry.getValue());
+        	}
+	        	
 	        //calculate total power profile of the system.
-	        calculateMinimumPowerProfile();
+	         calculateMinimumPowerProfile();
 	        
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
@@ -176,5 +256,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 			e.printStackTrace();
 		}
     }
+
+
     
 }

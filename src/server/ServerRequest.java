@@ -2,6 +2,7 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.Map;
 
 import server.Server;
 
@@ -21,45 +22,64 @@ public class ServerRequest implements Runnable {
 		String clientSentence;
 		int port = Integer.parseInt(server.details.get(serverName).get(1));
 	    ServerSocket welcomeSocket = new ServerSocket(port); 
-	    System.out.println(port);
+	
 	    
 		while(true) {
 	            Socket connectionSocket = welcomeSocket.accept();
-	            System.out.println("accepted invitation");
+	           
 	            //infrom client
 	            BufferedReader inFromClient = 
 	                    new BufferedReader(new InputStreamReader(
 	                        connectionSocket.getInputStream()));
-	            
-	            //outToclient
-	            DataOutputStream outToClient = 
-	                    new DataOutputStream(
-	                        connectionSocket.getOutputStream());
-	            
-	          //output stream
-	        	ObjectOutputStream outputStream = new ObjectOutputStream(
-	        			connectionSocket.getOutputStream());
-	            
+	                  
 	            clientSentence = inFromClient.readLine();
-	            System.out.println("clientSentence" + clientSentence);
+	            System.out.println("Sentence" + clientSentence);
+	           
 	            
 	            if(clientSentence.contentEquals("iteration")) {
+	            	
+	            	 //outToclient
+		            DataOutputStream outToClient = 
+		                    new DataOutputStream(
+		                        connectionSocket.getOutputStream());
+		            
 	            	int iteration = server.calculateIterationRound();
-	            	System.out.println("self iteration" +iteration);
 	            	outToClient.writeBytes(serverName+":"+iteration+'\n');
 	            	
 	            } else if(clientSentence.contains("request")) {
-	            	// return iteration
-	            	 String[] result = clientSentence.split(":");
-	            	 int iteration =  Integer.parseInt(result[2]);
-	            	 int index = iteration % Integer.parseInt(server.details.get(result[0]).get(4));
+	            	
+	                //output stream
+		        	ObjectOutputStream outputStream = new ObjectOutputStream(
+		        			connectionSocket.getOutputStream());
 	            	 
-	            	 index = index%server.aggregatePowerProfile.length;
+	            	 String[] result = clientSentence.split(":");
+	            	 
+	            	 System.out.println("result"+Arrays.toString(result));
+	            	 
+	            	 int iteration =  Integer.parseInt(result[2]);
+	            	 	            	            	 
+	            	 int index = iteration % Integer.parseInt(server.details.get(serverName).get(4));
+	            	 
+	            	 
+	            	 index = index % server.aggregatePowerProfile.length;
 	            	 
 	            	 double[] response = server.aggregatePowerProfile[index];
 	            	 
 	            	 DataObject obj = new DataObject(serverName, response);
+	            	 System.out.println(obj.serverName);
+	            	 System.out.println(Arrays.toString(obj.arrayValue));
+	            	 
 	            	 outputStream.writeObject(obj);
+	            	 
+	            }
+	            else if(clientSentence.contains("speed")) {
+	            	
+	            	  DataOutputStream outToClient = 
+			                    new DataOutputStream(
+			                        connectionSocket.getOutputStream());
+			            
+		            	String speed = server.details.get(serverName).get(4);
+		            	outToClient.writeBytes(serverName+":"+speed+'\n');
 	            	 
 	            }
 	            
@@ -70,7 +90,7 @@ public class ServerRequest implements Runnable {
 	
     public void run() {
         System.out.println("Hello from server thread!");
-        
+     
         try {
 			acceptRequest();
 		} catch (IOException e) {

@@ -13,22 +13,22 @@ import java.util.Map;
 
 public class Server {
 
-	public static int appliancePowerProfile[][];
-	public static double appliancePowerConsumption[];
-	public int timeConstraints[][];
-	public double[][] aggregatePowerProfile;
-	public static int startOfNinth = 0;
-	public static int endOfNinth = 0;
-	public static int startOfTenth = 0;
-	public static int endOfTenth = 0;
-	public int totalIteration = 1;
+	public  int appliancePowerProfile[][];
+	public  double appliancePowerConsumption[];
+	public  int timeConstraints[][];
+	public  double[][] aggregatePowerProfile;
+	public  int startOfNinth = 0;
+	public  int endOfNinth = 0;
+	public  int startOfTenth = 0;
+	public  int endOfTenth = 0;
+	public  int totalIteration = 1;
 	public Map<String,ArrayList<String>> details;
 	
 
 	// final decision.
-	public double[] minimumAggregatePowerValue;
-	public double[][] mimimumAggregatePowerProfile;
-	public double PAR;
+	public  double[] minimumAggregatePowerValue;
+	public  double[][] mimimumAggregatePowerProfile;
+	public  double PAR;
 	
 	
 	public Server() {
@@ -44,22 +44,16 @@ public class Server {
 		 details = new HashMap<String, ArrayList<String>>();
 		 
 		 ArrayList<String> value1 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.244","6789","false","0","0"));
+				    Arrays.asList("172.23.190.30","6789","false","0","0"));
 		 ArrayList<String> value2 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.244","8888","false","0","0"));
+				    Arrays.asList("172.23.190.30","8888","false","0","0"));
 		 ArrayList<String> value3 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.244","9999","false","0","0"));
+				    Arrays.asList("172.23.190.30","9999","false","0","0"));
 		 
 		 details.put("server1", value1);
 		 details.put("server2", value2);
 		 details.put("server3", value3);
 
-		 
-		 //startOfNinth = 7;
-		 //endOfNinth = 18;
-		 //startOfTenth = 9;
-		 //endOfTenth = 17;
-		 
 		 startOfNinth = 0;
 		 endOfNinth = 0;
 		 startOfTenth = 0;
@@ -107,7 +101,6 @@ public class Server {
 				}	
 			}
 			
-			System.out.println(Arrays.toString(ninthPowerProfile[i]));
 			startIndexNinth++;
 		}
 		
@@ -133,7 +126,7 @@ public class Server {
 				
 			}
 			
-			System.out.println(Arrays.toString(tenthPowerProfile[i]));
+			
 			startIndexTenth++;
 		}
 		
@@ -145,7 +138,7 @@ public class Server {
 
 		int profileIndex9 = 0;
 		int profileIndex10 = 0;
-		System.out.println(iterationForNinth*iterationForTenth + " " + iterationCount);
+		
 		for(int i=0;i<iterationForNinth*iterationForTenth;i++) {
 			if(i%speedOfNinth == 0 && i!=0) {
 				profileIndex9++;
@@ -165,7 +158,7 @@ public class Server {
 				aggregatePowerProfile[i][k] = aggregateSum;
 			}
 			
-			System.out.println(Arrays.toString(aggregatePowerProfile[i]));
+			
 			
 		}
 		
@@ -192,12 +185,12 @@ public class Server {
 		return iteration;
 	}
 	
-	public static void loadFromFile(String fileName) throws IOException {
+	public void loadFromFile(String fileName) throws IOException {
 		
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		    try {
 		        String line = br.readLine();
-		        System.out.println(line);
+		      
                 int lineCount = 0;
 		        while (line != null) {
 		        	String[] result = line.split(",");
@@ -230,29 +223,29 @@ public class Server {
 		
 		if(serverName.equals("server1")) {
 			try {
-				Server.loadFromFile("serverOneDetails");
+				serverObj.loadFromFile("serverOneDetails");
 			} catch (IOException e) {
 				System.out.println("Error reading file");
 			} 	
 		 } else if(serverName.equals("server2")) {
 			 try {
-				 Server.loadFromFile("serverTwoDetails");
+				 serverObj.loadFromFile("serverTwoDetails");
 			} catch (IOException e) {
 				System.out.println("Error reading file");
 			}
 		 } else if(serverName.equals("server3")) {
 			 try {
-				 Server.loadFromFile("serverThreeDetails");
+				 serverObj.loadFromFile("serverThreeDetails");
 			} catch (IOException e) {
 				System.out.println("Error reading file");
 			}
 		 }
 		
 		
-		 startOfNinth = Integer.parseInt(args[1]);
-		 endOfNinth = Integer.parseInt(args[2]);
-		 startOfTenth = Integer.parseInt(args[3]);
-		 endOfTenth = Integer.parseInt(args[4]);
+		serverObj.startOfNinth = Integer.parseInt(args[1]);
+		serverObj.endOfNinth = Integer.parseInt(args[2]);
+		serverObj.startOfTenth = Integer.parseInt(args[3]);
+		serverObj.endOfTenth = Integer.parseInt(args[4]);
 		 
 		 Thread a = new Thread(new ServerRequest(args[0],serverObj));
 		 a.start();
@@ -263,14 +256,17 @@ public class Server {
 
 
 	public void calcluateServerSpeed(String serverName) {
-		if(serverName == "server1") {
+		
+		if(serverName.equals("server1")) {
 			details.get(serverName).set(4,Integer.toString(totalIteration/Integer.parseInt(details.get(serverName).get(3))));
 		}
-		else if(serverName == "server2") {
+		else if(serverName.equals("server2")) {
+			
+			
 			int denom = Integer.parseInt(details.get(serverName).get(3)) * Integer.parseInt(details.get("server1").get(3));
 			details.get(serverName).set(4,Integer.toString(totalIteration/denom));
 		}
-		else if(serverName == "server3") {
+		else if(serverName.equals("server3")) {
 			details.get(serverName).set(4,"1");
 		}
 	}
