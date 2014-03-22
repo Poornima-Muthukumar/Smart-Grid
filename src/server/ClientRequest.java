@@ -18,9 +18,9 @@ public class ClientRequest implements Runnable{
 	public String serverName;
 	public List<Double> server1Obj; 
 	public List<Double> server2Obj;
-	public Map<String,Socket> clientSocketMap;
-	public Map<String,DataOutputStream> outServer;
-	public Map<String,BufferedReader> inServer;
+	//public Map<String,Socket> clientSocketMap;
+	//public Map<String,DataOutputStream> outServer;
+	//public Map<String,BufferedReader> inServer;
 
 	
 	public ClientRequest(String name, Server serverObj) {
@@ -28,9 +28,9 @@ public class ClientRequest implements Runnable{
 			serverName = name;
 			server1Obj = new ArrayList<Double>();
 			server2Obj = new ArrayList<Double>();
-			clientSocketMap = new HashMap<String, Socket>();
-			outServer = new HashMap<String, DataOutputStream>();
-			inServer = new HashMap<String, BufferedReader>();
+			//clientSocketMap = new HashMap<String, Socket>();
+			//outServer = new HashMap<String, DataOutputStream>();
+			//inServer = new HashMap<String, BufferedReader>();
 }
 
 	
@@ -56,6 +56,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 					 Socket clientSocket = null; 
 					 try{
 						 
+						 /*
 						 clientSocket = clientSocketMap.get(nameArray[i]);
 						 DataOutputStream outToServer = outServer.get(nameArray[i]);
 						 BufferedReader inFromServer = inServer.get(nameArray[i]);
@@ -78,10 +79,17 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 							 inFromServer = b;
 
 						 } 
-						 
-				         //clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
+						 */
+				         clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
 				         server.details.get(nameArray[i]).set(2, "true");
    
+				         DataOutputStream outToServer = new DataOutputStream(
+					                clientSocket.getOutputStream());
+					        
+						 BufferedReader inFromServer = 
+					                new BufferedReader(new InputStreamReader(
+					                    clientSocket.getInputStream()));
+						 
 				        if(request.equals("iteration")) {
 					      
 						        
@@ -91,12 +99,11 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 				        	String[] result = input.split(":");
 					        server.details.get(result[0]).set(3, result[1]);   
 					        server.totalIteration *= Integer.parseInt(result[1]);
-					        //clientSocket.close();
+					        clientSocket.close();
 				        }
 				        
 				        else if(request.contains("request")){
 
-				        	System.out.println("Inside");
 				        	outToServer.writeBytes(request+"\n");
 				        	String input = inFromServer.readLine();
 				        	
@@ -120,7 +127,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 				        		}
 				        	}
 				        	
-				        	//clientSocket.close();
+				        	clientSocket.close();
 				        }
 					}
 					 catch(IOException e) {
@@ -156,6 +163,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 			}
 			
 			double[] value = new double[24];
+			int minIndex = arrayIndex%server.aggregatePowerProfile.length;
 			value = server.aggregatePowerProfile[arrayIndex%server.aggregatePowerProfile.length];
 			
 			
@@ -189,8 +197,12 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 			//System.out.println("array length"+server1Obj.size());
 			//System.out.println("iteration"+j+Arrays.toString(server.minimumAggregatePowerValue));
 			
-			server.calculatePAR();
+			server.calculatePAR(minIndex);
 			System.out.println(j+" "+server.PAR);
+			
+			server.fixConfiguration();
+			System.out.println(Arrays.toString(server.appliancePowerProfile[9]));
+			System.out.println(Arrays.toString(server.appliancePowerProfile[10]));
 		}
 		
 	}
@@ -286,8 +298,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 
 	        for (Map.Entry entry : server.details.entrySet()) {
         	    System.out.println(entry.getKey() + ", " + entry.getValue());
-        	}
-	        	
+        	}	
 	        //calculate total power profile of the system.
 	        calculateMinimumPowerProfile();
 	        

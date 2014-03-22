@@ -24,9 +24,10 @@ public class ServerRequest implements Runnable {
 		
 		String clientSentence;
 		int port = Integer.parseInt(server.details.get(serverName).get(1));
-	    ServerSocket welcomeSocket = new ServerSocket(port); 
-	
-	    
+	    ServerSocket welcomeSocket = new ServerSocket(); 
+	    welcomeSocket.setReuseAddress(true);
+	    welcomeSocket.bind(new InetSocketAddress(port));
+	   
 		while(true) {
 	            Socket connectionSocket = welcomeSocket.accept();
 	           
@@ -36,7 +37,7 @@ public class ServerRequest implements Runnable {
 	                        connectionSocket.getInputStream()));
 	                  
 	            clientSentence = inFromClient.readLine(); 
-	            System.out.println(clientSentence);
+
 	            
 	            if(clientSentence.contentEquals("iteration")) {
 	            	
@@ -47,6 +48,7 @@ public class ServerRequest implements Runnable {
 		            
 	            	int iteration = server.calculateIterationRound();
 	            	outToClient.writeBytes(serverName+":"+iteration+'\n');
+	            	connectionSocket.close();
 	            	
 	            } else if(clientSentence.contains("request")) {
 	            	
@@ -81,6 +83,7 @@ public class ServerRequest implements Runnable {
 	            	 double[] response = server.aggregatePowerProfile[index];
 	            	 
 	            	 outToClient.writeBytes(Arrays.toString(response)+"\n");
+	            	 connectionSocket.close();
 	            	 
 	            }
 	            else if(clientSentence.contains("speed")) {
@@ -91,6 +94,8 @@ public class ServerRequest implements Runnable {
 			            
 		            	String speed = server.details.get(serverName).get(4);
 		            	outToClient.writeBytes(serverName+":"+speed+'\n');
+		            	
+		            	connectionSocket.close();
 	            	 
 	            }
 	            

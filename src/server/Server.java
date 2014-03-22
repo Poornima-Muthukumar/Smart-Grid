@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.primitives.Ints;
+
 
 public class Server {
 
@@ -22,6 +24,7 @@ public class Server {
 	public  int startOfTenth = 0;
 	public  int endOfTenth = 0;
 	public  int totalIteration = 1;
+	public int INDEX;
 	public Map<String,ArrayList<String>> details;
 	
 
@@ -30,8 +33,13 @@ public class Server {
 	public  double[][] mimimumAggregatePowerProfile;
 	public  double PAR = Double.MAX_VALUE;
 	
+	public Map<Integer,ArrayList<Integer>> ninthConfig;
+	public Map<Integer,ArrayList<Integer>> tenthConfig;
 	
 	public Server() {
+	 	 ninthConfig = new HashMap<Integer,ArrayList<Integer>>();
+	 	 tenthConfig = new HashMap<Integer,ArrayList<Integer>>();
+	 	 
 		 appliancePowerProfile  = new int[11][];
 		 
 		 for(int i=0;i<11;i++) {
@@ -88,6 +96,7 @@ public class Server {
 		
 		
 		for(int i=0;i<iterationForNinth;i++) {
+			
 			ninthPowerProfile[i] = new int[24];
 			for(int j=0;j<24;j++) {
 				
@@ -140,6 +149,7 @@ public class Server {
 		int profileIndex10 = 0;
 		
 		for(int i=0;i<iterationForNinth*iterationForTenth;i++) {
+			
 			if(i%speedOfNinth == 0 && i!=0) {
 				profileIndex9++;
 			} 
@@ -149,7 +159,8 @@ public class Server {
 			appliancePowerProfile[9] = ninthPowerProfile[profileIndex9%iterationForNinth];
 			appliancePowerProfile[10] = tenthPowerProfile[profileIndex10%iterationForTenth];
 					
-			
+			ninthConfig.put(i, (ArrayList<Integer>) Ints.asList(appliancePowerProfile[9]));
+			tenthConfig.put(i, (ArrayList<Integer>) Ints.asList(appliancePowerProfile[10]));
 			for(int k=0; k < appliancePowerProfile[0].length; k++) {
 				double aggregateSum = 0;
 				for(int j=0; j< appliancePowerProfile.length;j++) {
@@ -272,7 +283,7 @@ public class Server {
 	}
 
 
-	public void calculatePAR() {
+	public void calculatePAR(int minIndex) {
 		
 		double max = 0;
 		double sum = 0;
@@ -289,6 +300,13 @@ public class Server {
 		//System.out.println(sum+ " " + max + " " +average);
 		if (currentPAR < PAR) {
 			PAR = currentPAR;	
+			INDEX = minIndex;
 		}
+	}
+
+
+	public void fixConfiguration() {
+		appliancePowerProfile[9] = Ints.toArray(ninthConfig.get(INDEX));
+		appliancePowerProfile[10] = Ints.toArray(tenthConfig.get(INDEX));
 	}
 }
