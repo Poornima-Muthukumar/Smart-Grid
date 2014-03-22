@@ -28,7 +28,7 @@ public class Server {
 	// final decision.
 	public  double[] minimumAggregatePowerValue;
 	public  double[][] mimimumAggregatePowerProfile;
-	public  double PAR;
+	public  double PAR = Double.MAX_VALUE;
 	
 	
 	public Server() {
@@ -44,11 +44,11 @@ public class Server {
 		 details = new HashMap<String, ArrayList<String>>();
 		 
 		 ArrayList<String> value1 = new ArrayList<String>(
-				    Arrays.asList("172.23.190.30","6789","false","0","0"));
+				    Arrays.asList("172.23.189.174","6789","false","0","0"));
 		 ArrayList<String> value2 = new ArrayList<String>(
-				    Arrays.asList("172.23.190.30","8888","false","0","0"));
+				    Arrays.asList("172.23.189.174","8888","false","0","0"));
 		 ArrayList<String> value3 = new ArrayList<String>(
-				    Arrays.asList("172.23.190.30","9999","false","0","0"));
+				    Arrays.asList("172.23.189.174","9999","false","0","0"));
 		 
 		 details.put("server1", value1);
 		 details.put("server2", value2);
@@ -283,11 +283,12 @@ public class Server {
 			}
 			sum+=minimumAggregatePowerValue[i];
 		}
+
 		double average = sum/24;
 		double currentPAR = max/average;
+		//System.out.println(sum+ " " + max + " " +average);
 		if (currentPAR < PAR) {
-			PAR = currentPAR;
-			
+			PAR = currentPAR;	
 		}
 	}
 }

@@ -2,6 +2,7 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import server.Server;
@@ -11,6 +12,8 @@ public class ServerRequest implements Runnable {
 
 	public Server server;
 	public String serverName;
+	public Map<String,Integer> powerIndex = new HashMap<String,Integer>();
+
 	
 	public ServerRequest(String name, Server serverObj) {
 			server = serverObj;
@@ -32,9 +35,8 @@ public class ServerRequest implements Runnable {
 	                    new BufferedReader(new InputStreamReader(
 	                        connectionSocket.getInputStream()));
 	                  
-	            clientSentence = inFromClient.readLine();
-	            System.out.println("Sentence" + clientSentence);
-	           
+	            clientSentence = inFromClient.readLine(); 
+	            System.out.println(clientSentence);
 	            
 	            if(clientSentence.contentEquals("iteration")) {
 	            	
@@ -48,28 +50,37 @@ public class ServerRequest implements Runnable {
 	            	
 	            } else if(clientSentence.contains("request")) {
 	            	
-	                //output stream
-		        	ObjectOutputStream outputStream = new ObjectOutputStream(
-		        			connectionSocket.getOutputStream());
+	            	 //outToclient
+		            DataOutputStream outToClient = 
+		                    new DataOutputStream(
+		                        connectionSocket.getOutputStream());
 	            	 
 	            	 String[] result = clientSentence.split(":");
-	            	 
-	            	 System.out.println("result"+Arrays.toString(result));
-	            	 
+	            	  
 	            	 int iteration =  Integer.parseInt(result[2]);
-	            	 	            	            	 
-	            	 int index = iteration % Integer.parseInt(server.details.get(serverName).get(4));
+	            	 	          
 	            	 
+	            	 if((iteration % Integer.parseInt(server.details.get(serverName).get(4)))==0 && iteration!=0) {
+	            		 if(powerIndex.containsKey(result[0])) {
+	            			 int a = powerIndex.get(result[0]);
+	            			 a++;
+	            			 powerIndex.put(result[0], a);
+	            		 } else {
+	            			 powerIndex.put(result[0], 1);
+	            		 }
+	            	 } else {
+	            		if(!powerIndex.containsKey(result[0])){
+	            			powerIndex.put(result[0], 0);
+	            		}
+	            	 }
+	            	   	 
+	            	 int index = powerIndex.get(result[0]) % server.aggregatePowerProfile.length;
 	            	 
-	            	 index = index % server.aggregatePowerProfile.length;
+	            	// System.out.println(result[0] + " " +result[2] + " " +index);
 	            	 
 	            	 double[] response = server.aggregatePowerProfile[index];
 	            	 
-	            	 DataObject obj = new DataObject(serverName, response);
-	            	 System.out.println(obj.serverName);
-	            	 System.out.println(Arrays.toString(obj.arrayValue));
-	            	 
-	            	 outputStream.writeObject(obj);
+	            	 outToClient.writeBytes(Arrays.toString(response)+"\n");
 	            	 
 	            }
 	            else if(clientSentence.contains("speed")) {
