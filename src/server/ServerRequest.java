@@ -24,6 +24,8 @@ public class ServerRequest implements Runnable {
 			reader = new HashMap<BufferedReader,DataOutputStream>() ;
 	}
 
+	/*Server Thread to accept new Socket connections. 
+	 Once the server accepts a new socket connection, it saves the socket, DataInputStream, BufferedReader and then creates a new thread(ServerProcessor) that handles input/output to the socket */
 	public void acceptRequest() throws IOException {
 		
 		int port = Integer.parseInt(server.details.get(serverName).get(1));
@@ -33,7 +35,7 @@ public class ServerRequest implements Runnable {
 	   
 	     while(true) {
 	    	  Socket connectionSocket = welcomeSocket.accept();
-	    	 // System.out.println(connectionSocket);
+	    	 
 	    	  serverSocket.add(connectionSocket);
 	    	  BufferedReader inFromClient = 
 	                    new BufferedReader(new InputStreamReader(
@@ -53,6 +55,7 @@ public class ServerRequest implements Runnable {
     public void run() {
         System.out.println("Hello from server thread!");
         try {
+        	//While loop to accept incoming requests from the clients.
 			acceptRequest();
 		} catch (IOException e) {
 			System.out.println("failed to accept request");

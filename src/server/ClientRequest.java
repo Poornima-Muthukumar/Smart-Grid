@@ -35,7 +35,7 @@ public class ClientRequest implements Runnable{
 			inServer = new HashMap<String, BufferedReader>();
    }
 
-	
+	// The client will either send a request to get iteration from the other two servers or a request to get aggregatePowerProfile from the other servers.
     public void setUpConnection(String request)  {
             
             
@@ -58,7 +58,7 @@ public class ClientRequest implements Runnable{
                         Socket clientSocket = null; 
                         try{
                             
-
+                        	//Logic to save socket in order to reuse the same socket instead of creating one everytime.
                             clientSocket = clientSocketMap.get(nameArray[i]);
                             DataOutputStream outToServer = outServer.get(nameArray[i]);
                             BufferedReader inFromServer = inServer.get(nameArray[i]);
@@ -176,7 +176,9 @@ public class ClientRequest implements Runnable{
                     }
             }
     }
-
+    
+    //Go through all possible iterations and request aggregate power profile from other servers and calculate PAR/VARIANCE.
+    
 	public void calculateMinimumPowerProfile()  {
 		
 		int arrayIndex = 0;
@@ -191,26 +193,32 @@ public class ClientRequest implements Runnable{
 			
 			int minIndex = arrayIndex%server.aggregatePowerProfile.length;
 
+			
 			Set<String> name = server.details.keySet();
 			for(String n : name) {
 				server.details.get(n).set(2, "false");
 			}
 							
+			//code to set up connection with the other clients to request their aggreagte power profile.
 			setUpConnection(serverName+":request:"+j);
 			
+			//calculate total aggreagte power profile for the system at the end of each iteration.
 			for(int i=0;i<24;i++) {
 				server.minimumAggregatePowerValue[i] = server.aggregatePowerProfile[minIndex][i] + server1Obj.get(i) + server2Obj.get(i);
 			}
 			
+			//server1Obj and server2Obj arraylist are used to store the aggregate power profile received from the other two servers after every iteration.
 			server1Obj.clear();
 			server2Obj.clear();
 			
+			//based on the operation required either compute par or compute variance.
 			if(operation.equals("par")) {
 				server.calculatePAR(minIndex);
+				//System.out.println(j + " " + server.PAR);
 			} else if(operation.equals("variance")) {
 				server.calculateVariance(minIndex);
+				System.out.println(j + " " + server.variance);
 			}
-			
 		}
 		
 	}
@@ -338,8 +346,6 @@ public class ClientRequest implements Runnable{
 	        calculateMinimumPowerProfile();
 	        
 	        server.fixConfiguration(operation);
-	        System.out.println(server.PAR);
-	        
-
+	      
 	}
 }

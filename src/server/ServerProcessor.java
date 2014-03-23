@@ -31,6 +31,7 @@ public class ServerProcessor implements Runnable {
 			String clientSentence = null;	
 			
 	            try {
+	            	//Read from client and do accordingly.
 					clientSentence = inFromClient.readLine();
 					if (clientSentence == null) {
 						return;
@@ -40,6 +41,7 @@ public class ServerProcessor implements Runnable {
 					return;
 				} 
 
+	            //Round 1 when the client requests for the iteration value from the server inorder to calculate the total iteration value and client speed.
 	            if(clientSentence.contentEquals("iteration")) {
  
 	            	int iteration = server.calculateIterationRound();
@@ -51,12 +53,14 @@ public class ServerProcessor implements Runnable {
 					}
 	            	
 	            	
-	            } else if(clientSentence.contains("request")) {
+	            } 
+	            //when the server receives a request from the client to return the total aggregate power profile for a particular iteration round. 
+	            else if(clientSentence.contains("request")) {
 	            	
 	            	 String[] result = clientSentence.split(":");
 	            	  
 	            	 int iteration =  Integer.parseInt(result[2]);
-
+	            	 
 	            	 if((iteration % Integer.parseInt(server.details.get(serverName).get(4)))==0 && iteration!=0) {
 	            		 if(powerIndex.containsKey(result[0])) {
 	            			 int a = powerIndex.get(result[0]);
@@ -81,6 +85,9 @@ public class ServerProcessor implements Runnable {
 					}
 	            	 
 	            }
+	            
+	            //each client waits for the other servers to calculate its speed based on the total iteration.
+	            // therefore each server returns its own speed when requested by the clients.
 	            else if(clientSentence.contains("speed")) {
 	            
 		            	String speed = server.details.get(serverName).get(4);

@@ -16,7 +16,7 @@ import com.google.common.primitives.Ints;
 
 
 public class Server {
-
+	
 	public  int appliancePowerProfile[][];
 	public  double appliancePowerConsumption[];
 	public  int timeConstraints[][];
@@ -37,9 +37,13 @@ public class Server {
 	public  double[][] mimimumAggregatePowerProfile;
 	public  double PAR = Double.MAX_VALUE;
 	
+	
 	public Map<Integer,ArrayList<Integer>> ninthConfig;
 	public Map<Integer,ArrayList<Integer>> tenthConfig;
-	
+	 
+	/* Server constructor to initialize the values.
+	 * 
+	 */
 	public Server() {
 	 	 ninthConfig = new HashMap<Integer,ArrayList<Integer>>();
 	 	 tenthConfig = new HashMap<Integer,ArrayList<Integer>>();
@@ -72,7 +76,10 @@ public class Server {
 		 endOfTenth = 0;
 		 
 	}
-	
+	/* This method calculates all possible ways in which a server can arrange its appliances and calculates the aggregate power profile.
+	 * Lets say appliance_9 can be arranged in 10 ways and appliance_10 can be arranged in 5 ways so the total iteration for that server is 10*5 = 50 ways.
+	 * These 50 possible total aggregate power profile are calculated at the start of the system and based on the speed of the server the system will pick a particular index in the array and return that value to the clients. 
+	 */
 	
 	public void calculateAggregatePowerProfile(int iterationCount) {
 			
@@ -198,6 +205,8 @@ public class Server {
 	
 	}
 	
+	/*Logic to calculate the iteration round for each server 
+	based on the different possible arrangements of the appliance 9 and 10 within each server*/
 	public int calculateIterationRound() {
 		
 		int sumOfNinth = 0;
@@ -218,6 +227,9 @@ public class Server {
 		return iteration;
 	}
 	
+	
+	// logic to read the power profile of the 11 appliances (9 fixed + 2 flexible) from the file and load them into the 2D array - appliancePowerProfile[11][24].
+	// logic to load the power consumption of the 11 appliaces into the 1D array - appliancePowerConsumption[11].
 	public void loadFromFile(String fileName) throws IOException {
 		
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
@@ -247,6 +259,19 @@ public class Server {
 		    }
 	}
 	
+	/* This is the main function which starts off first.
+	 
+	 It reads the input arguments and assigns them accordingly.
+	 
+	 It loads the power profile of the appliances from the file based on the serverName.
+	 eg. from serverOneDetails for server1, from serverTwoDetails for server2, from serverThreeDetails for server3.
+	 
+	 It sets the start and end time for the two flexible appliances(9 and 10).
+	  
+	 It also creates the Client Thread (serverRequest) which will request the power profile from the other servers.
+	 
+	 It also creates the Server Thread (clientRequest) which responds to the requests sent by the other clients.
+	  */
 	public static void main(String[] args) {
 		 //.out.println("Server 1");
 		 
@@ -279,13 +304,7 @@ public class Server {
 		serverObj.endOfNinth = Integer.parseInt(args[2]);
 		serverObj.startOfTenth = Integer.parseInt(args[3]);
 		serverObj.endOfTenth = Integer.parseInt(args[4]);
-		 
-		 Thread a = new Thread(new ServerRequest(args[0],serverObj));
-		 a.start();
-		 
-		 Thread b = new Thread(new ClientRequest(args[0],serverObj,args[5]));
-		 b.start();
-		 
+		
 		 serverObj.details.get("server1").set(0, args[6]);
 		 serverObj.details.get("server1").set(1, args[7]);
 		 
@@ -295,9 +314,19 @@ public class Server {
 		 serverObj.details.get("server3").set(0, args[10]);
 		 serverObj.details.get("server3").set(1, args[11]);
 		 
+		 Thread a = new Thread(new ServerRequest(args[0],serverObj));
+		 a.start();
+		 
+		 Thread b = new Thread(new ClientRequest(args[0],serverObj,args[5]));
+		 b.start();
+		 
+		
+		 
 	}
 
 
+	//Each client/server will calculate its own speed at which it should go through the total possible iteration logic - similar to the truth table logic explained in the report.
+	//The client/server will calculate the speed at the beginning of the iteration round.
 	public void calcluateServerSpeed(String serverName) {
 
 			if(serverName.equals("server1")) {
@@ -312,8 +341,9 @@ public class Server {
 				details.get(serverName).set(4,"1");
 			}	
 	}
-
-
+	
+	//this method calculates the PAR for each iteration round and 
+	// saves the index of the array aggregatePowerProfile if its corresponding PAR was the minimum value that was reached up until that iteration. 
 	public void calculatePAR(int minIndex) {
 		
 		double max = 0;
@@ -328,13 +358,15 @@ public class Server {
 
 		double average = sum/24;
 		double currentPAR = max/average;
-		//System.out.println(sum+ " " + max + " " +average);
+		
 		if (currentPAR < PAR) {
 			PAR = currentPAR;	
 			INDEX = minIndex;
 		}
 	}
 	
+	//this method calculates the variance for each iteration round and 
+	// saves the index of the array aggregatePowerProfile if its corresponding Variance was the minimum value that was reached up until that iteration. 
 	public void calculateVariance(int minIndex) {
 		
 		double sum = 0;
@@ -360,7 +392,9 @@ public class Server {
 		}
 	}
 
-
+	
+	// Once all the iterations are done, we fix the configuration for appliance 9 and appliance 10 which are the flexible appliances
+    //based on the indexes we saved (VARIANCE_INDEX, INDEX) for the iteration which gave us the best configuration.
 	public void fixConfiguration(String operation) {
 		if(operation.equals("variance")) {
 			appliancePowerProfile[9] = Ints.toArray(ninthConfig.get(VARIANCE_INDEX));
