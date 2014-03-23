@@ -97,13 +97,12 @@ public class Server {
 				sumOfTenth+=appliancePowerProfile[10][i];
 			}
 		
-		
-		
+
 		int dif1 = (endOfNinth > startOfNinth ) ? endOfNinth - startOfNinth : (endOfNinth+24) - startOfNinth;
 		int dif2 = (endOfTenth > startOfTenth ) ? endOfTenth - startOfTenth : (endOfTenth+24) - startOfTenth;
 		int iterationForNinth = (dif1 - sumOfNinth) + 1;
 		int iterationForTenth = (dif2 - sumOfTenth) + 1;
-
+		
 		
 		int startIndexNinth = startOfNinth;
 		
@@ -113,49 +112,30 @@ public class Server {
 		for(int i=0;i<iterationForNinth;i++) {
 			
 			ninthPowerProfile[i] = new int[24];
-			for(int j=0;j<24;j++) {
-				
-				
-				if(j>=startIndexNinth && j<startIndexNinth+sumOfNinth) {
-					ninthPowerProfile[i][j] = 1;
-					
-				} else {
-					ninthPowerProfile[i][j] = 0;
-					
-				}	
+			int start = startIndexNinth;
+			int end = startIndexNinth+sumOfNinth;
+			for(int j = start;j < end; j++) {
+					ninthPowerProfile[i][j%24] = 1;					
 			}
-			
 			startIndexNinth++;
 		}
 		
 		
 		
 		int tenthPowerProfile[][] = new int[iterationForTenth][24];
-		
-		
 		int startIndexTenth = startOfTenth;
+		
 		for(int i=0;i<iterationForTenth;i++) {
 			
 			tenthPowerProfile[i] = new int[24];
-			for(int j=0;j<24;j++) {
-				
-				
-				if(j>=startIndexTenth && j<startIndexTenth+sumOfTenth) {
-					tenthPowerProfile[i][j] = 1;
-					
-				} else {
-					tenthPowerProfile[i][j] = 0;
-					
-				}
-				
+			int start = startIndexTenth;
+			int end = startIndexTenth+sumOfTenth;
+			for(int j = start;j < end; j++) {
+					tenthPowerProfile[i][j%24] = 1;					
 			}
-			
-			
 			startIndexTenth++;
 		}
-		
-		
-		
+
 		int speedOfNinth = (iterationForNinth*iterationForTenth)/iterationForNinth;
 		int speedOfTenth = 1;
 		

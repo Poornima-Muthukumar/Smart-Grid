@@ -45,6 +45,7 @@ public class ServerProcessor implements Runnable {
 	            if(clientSentence.contentEquals("iteration")) {
  
 	            	int iteration = server.calculateIterationRound();
+	            	
 	            	try {
 						outToClient.writeBytes(serverName+":"+iteration+'\n');
 					} catch (IOException e) {

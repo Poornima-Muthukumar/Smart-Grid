@@ -110,7 +110,8 @@ public class ClientRequest implements Runnable{
                                 
                                 
                                 String[] result = input.split(":");
-                                server.details.get(result[0]).set(3, result[1]);   
+                                server.details.get(result[0]).set(3, result[1]);  
+                                System.out.println(result[0]+" " +result[1]);
                                 server.totalIteration *= Integer.parseInt(result[1]);
                             
                             }
@@ -214,7 +215,7 @@ public class ClientRequest implements Runnable{
 			//based on the operation required either compute par or compute variance.
 			if(operation.equals("par")) {
 				server.calculatePAR(minIndex);
-				//System.out.println(j + " " + server.PAR);
+				System.out.println(j + " " + server.PAR);
 			} else if(operation.equals("variance")) {
 				server.calculateVariance(minIndex);
 				System.out.println(j + " " + server.variance);
@@ -322,16 +323,16 @@ public class ClientRequest implements Runnable{
 			length = server.details.size()-1;
         	//Step1 - request iteration from other servers.
         	int selfCount = server.calculateIterationRound();
+        	
 			server.totalIteration*=selfCount;
 			server.details.get(serverName).set(3, Integer.toString(selfCount));
 		     
 		    // calcuate aggregate power profile for different appliance configuation for each server. 
 			server.calculateAggregatePowerProfile(selfCount);
-			
-			System.out.println("iteration count" + selfCount);
+        	
 			
 			setUpConnection("iteration");
-							
+						
 			
 			//calculate individual speed.
 			server.calcluateServerSpeed(serverName);
