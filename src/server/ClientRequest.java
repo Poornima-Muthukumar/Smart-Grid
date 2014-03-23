@@ -139,7 +139,6 @@ public void setUpConnection(String request)  {
 				        	if(server1Obj.isEmpty()) {
 				        		for(String d: result) {
 				        			server1Obj.add(Double.parseDouble(d)); 
-				        			server2Obj.add(0.0);
 				        		}	
 				        	} else {
 				        		for(String d: result) {
@@ -314,16 +313,8 @@ public void setUpConnection(String request)  {
 	}
 	
 	public void run() {
-       System.out.println("Hello from client thread!");  
+			System.out.println("Hello from client thread!");  
         	
-			Set<String> name1 = server.details.keySet();
-			for(String n : name1) {
-				server.details.get(n).set(2, "false");
-				server.details.get(n).set(3, "0");
-				server.details.get(n).set(4, "0");
-				server.details.get(n).set(5, "0");
-			}
-	
 			length = server.details.size() -1;
         	//Step1 - request iteration from other servers.
         	int selfCount = server.calculateIterationRound();
@@ -332,28 +323,7 @@ public void setUpConnection(String request)  {
 		     
 		    // calcuate aggregate power profile for different appliance configuation for each server. 
 			server.calculateAggregatePowerProfile(selfCount);
-			
-			if(length==0) {
-				
-					for(int d=0;d<selfCount;d++) {
-						for(int i=0;i<24;i++) {
-							server.minimumAggregatePowerValue[i] = server.aggregatePowerProfile[d][i];
-						}
-						if(operation.equals("par")) {
-							server.calculatePAR(d);
-							System.out.println(server.PAR);
-						}
-						else {
-							server.calculateVariance(d);
-							System.out.println(server.variance);
-						}
-					}
-					
-					server.fixConfiguration(operation);
-					
-					
-			} else {
-			
+
 			setUpConnection("iteration");
 							
 			//calculate individual speed.
@@ -369,7 +339,6 @@ public void setUpConnection(String request)  {
 	        calculateMinimumPowerProfile();
 	        
 	        server.fixConfiguration(operation);
-			}
 
 	}
 }

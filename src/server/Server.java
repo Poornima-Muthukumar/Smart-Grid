@@ -291,7 +291,6 @@ public class Server {
 
 	public void calcluateServerSpeed(String serverName) {
 
-		if(details.size() == 3) {
 			if(serverName.equals("server1")) {
 				details.get(serverName).set(4,Integer.toString(totalIteration/Integer.parseInt(details.get(serverName).get(3))));
 			}
@@ -303,33 +302,6 @@ public class Server {
 			else if(serverName.equals("server3")) {
 				details.get(serverName).set(4,"1");
 			}	
-		} 
-		else if(details.size() == 2) {
-				
-				Set<String> name1 = details.keySet();
-					
-					char a = serverName.charAt(6);
-					int val = a -'0';
-					
-					for(String n:name1) {	
-						if(!n.equals(serverName)) {
-							char b = n.charAt(6);
-							int val1 = b -'0';
-							if(val1 > val) {
-								details.get(serverName).set(4,Integer.toString(1));
-							} else {
-								details.get(serverName).set(4,Integer.toString(totalIteration/Integer.parseInt(details.get(serverName).get(3))));
-							}
-						}
-					}
-					
-				
-						
-		}
-		
-		
-		
-		
 	}
 
 
