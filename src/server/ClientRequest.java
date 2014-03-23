@@ -18,20 +18,22 @@ public class ClientRequest implements Runnable{
 	public String serverName;
 	public List<Double> server1Obj; 
 	public List<Double> server2Obj;
-	//public Map<String,Socket> clientSocketMap;
-	//public Map<String,DataOutputStream> outServer;
-	//public Map<String,BufferedReader> inServer;
+	public String operation;
+	public Map<String,Socket> clientSocketMap;
+	public Map<String,DataOutputStream> outServer;
+	public Map<String,BufferedReader> inServer;
 
 	
-	public ClientRequest(String name, Server serverObj) {
+	public ClientRequest(String name, Server serverObj, String op) {
 			server = serverObj;
 			serverName = name;
 			server1Obj = new ArrayList<Double>();
 			server2Obj = new ArrayList<Double>();
-			//clientSocketMap = new HashMap<String, Socket>();
-			//outServer = new HashMap<String, DataOutputStream>();
-			//inServer = new HashMap<String, BufferedReader>();
-}
+			operation = op;
+			clientSocketMap = new HashMap<String, Socket>();
+			outServer = new HashMap<String, DataOutputStream>();
+			inServer = new HashMap<String, BufferedReader>();
+   }
 
 	
 public void setUpConnection(String request) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
@@ -56,12 +58,10 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 					 Socket clientSocket = null; 
 					 try{
 						 
-						 /*
+
 						 clientSocket = clientSocketMap.get(nameArray[i]);
 						 DataOutputStream outToServer = outServer.get(nameArray[i]);
 						 BufferedReader inFromServer = inServer.get(nameArray[i]);
-						 
-						 System.out.println("clientSocket" + clientSocket);
 						 
 						 if(clientSocket == null) {
 							 clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
@@ -79,17 +79,11 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 							 inFromServer = b;
 
 						 } 
-						 */
-				         clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
+
+
+				        // clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
 				         server.details.get(nameArray[i]).set(2, "true");
    
-				         DataOutputStream outToServer = new DataOutputStream(
-					                clientSocket.getOutputStream());
-					        
-						 BufferedReader inFromServer = 
-					                new BufferedReader(new InputStreamReader(
-					                    clientSocket.getInputStream()));
-						 
 				        if(request.equals("iteration")) {
 					      
 						        
@@ -99,7 +93,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 				        	String[] result = input.split(":");
 					        server.details.get(result[0]).set(3, result[1]);   
 					        server.totalIteration *= Integer.parseInt(result[1]);
-					        clientSocket.close();
+					       
 				        }
 				        
 				        else if(request.contains("request")){
@@ -127,7 +121,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 				        		}
 				        	}
 				        	
-				        	clientSocket.close();
+				        	
 				        }
 					}
 					 catch(IOException e) {
@@ -135,7 +129,7 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 						 if(i==2) {
 							 i=0;
 						 }
-						 System.out.println(e.getMessage());
+						 //System.out.println(e.getMessage());
 						 System.out.println("OH NOES");
 						 continue;
 					 }
@@ -197,12 +191,15 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 			//System.out.println("array length"+server1Obj.size());
 			//System.out.println("iteration"+j+Arrays.toString(server.minimumAggregatePowerValue));
 			
-			server.calculatePAR(minIndex);
-			System.out.println(j+" "+server.PAR);
+			if(operation.equals("par")) {
+				server.calculatePAR(minIndex);
+				System.out.println(j+" "+server.PAR);
+			} else if(operation.equals("variance")) {
+				server.calculateVariance(minIndex);
+				System.out.println(j+" "+server.variance);
+			}
 			
-			server.fixConfiguration();
-			System.out.println(Arrays.toString(server.appliancePowerProfile[9]));
-			System.out.println(Arrays.toString(server.appliancePowerProfile[10]));
+			server.fixConfiguration(operation);
 		}
 		
 	}
@@ -228,23 +225,41 @@ public void setUpConnection(String request) throws NumberFormatException, Unknow
 					 if(server.details.get(nameArray[i]).get(2).equals("false") || server.details.get(nameArray[i]).get(4).equals("0")) {	
 						 
 						 try{
-					         clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
-					         server.details.get(nameArray[i]).set(2, "true");
-	 
-						        DataOutputStream outToServer = new DataOutputStream(
+							 
+							 clientSocket = clientSocketMap.get(nameArray[i]);
+							 DataOutputStream outToServer = outServer.get(nameArray[i]);
+							 BufferedReader inFromServer = inServer.get(nameArray[i]);
+							 
+							 System.out.println("clientSocket" + clientSocket);
+							 
+							 if(clientSocket == null) {
+								 clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
+								 clientSocketMap.put(nameArray[i], clientSocket);
+								 DataOutputStream a = new DataOutputStream(
 							                clientSocket.getOutputStream());
 							        
-							     BufferedReader inFromServer = 
+								 BufferedReader b = 
 							                new BufferedReader(new InputStreamReader(
 							                    clientSocket.getInputStream()));
-							        
+								 
+								 inServer.put(nameArray[i], b);
+								 outServer.put(nameArray[i], a);
+								 outToServer = a;
+								 inFromServer = b;
+
+							 } 
+
+							 
+					         //clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
+					         server.details.get(nameArray[i]).set(2, "true");
+	 
 						        outToServer.writeBytes("speed\n");
 						        String input = inFromServer.readLine();
 						              
 					        	String[] result = input.split(":");
 						        server.details.get(result[0]).set(4, result[1]);     
-						        clientSocket.close();
-					        }		     
+						        
+					       }		     
 						 catch(IOException e) {
 							 i++;
 							 if(i==2) {

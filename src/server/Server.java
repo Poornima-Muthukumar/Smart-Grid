@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.primitives.Ints;
@@ -25,6 +26,8 @@ public class Server {
 	public  int endOfTenth = 0;
 	public  int totalIteration = 1;
 	public int INDEX;
+	public int VARIANCE_INDEX;
+	public double variance = Double.MAX_VALUE;
 	public Map<String,ArrayList<String>> details;
 	
 
@@ -52,11 +55,11 @@ public class Server {
 		 details = new HashMap<String, ArrayList<String>>();
 		 
 		 ArrayList<String> value1 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.174","6789","false","0","0"));
+				    Arrays.asList("172.23.191.116","6789","false","0","0"));
 		 ArrayList<String> value2 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.174","8888","false","0","0"));
+				    Arrays.asList("172.23.191.116","8888","false","0","0"));
 		 ArrayList<String> value3 = new ArrayList<String>(
-				    Arrays.asList("172.23.189.174","9999","false","0","0"));
+				    Arrays.asList("172.23.191.116","9999","false","0","0"));
 		 
 		 details.put("server1", value1);
 		 details.put("server2", value2);
@@ -87,8 +90,12 @@ public class Server {
 			}
 		
 		
-		int iterationForNinth = (endOfNinth - startOfNinth) - sumOfNinth +2; 
-		int iterationForTenth = (endOfTenth - startOfTenth) - sumOfTenth +2; 
+		
+		int dif1 = (endOfNinth > startOfNinth ) ? endOfNinth - startOfNinth : startOfNinth%12 + endOfNinth;
+		int dif2 = (endOfTenth > startOfTenth ) ? endOfTenth - startOfTenth : startOfTenth%12 + endOfTenth;
+		int iterationForNinth = (dif1 - sumOfNinth) + 2;
+		int iterationForTenth = (dif2 - sumOfTenth) + 2;
+
 		
 		int startIndexNinth = startOfNinth;
 		
@@ -159,8 +166,22 @@ public class Server {
 			appliancePowerProfile[9] = ninthPowerProfile[profileIndex9%iterationForNinth];
 			appliancePowerProfile[10] = tenthPowerProfile[profileIndex10%iterationForTenth];
 					
-			ninthConfig.put(i, (ArrayList<Integer>) Ints.asList(appliancePowerProfile[9]));
-			tenthConfig.put(i, (ArrayList<Integer>) Ints.asList(appliancePowerProfile[10]));
+			ArrayList<Integer> nine = new ArrayList<Integer>();
+			ArrayList<Integer> ten = new ArrayList<Integer>();
+			
+			for(int a: appliancePowerProfile[9]) {
+				nine.add(a);
+			}
+			
+			for(int b: appliancePowerProfile[10]) {
+				ten.add(b);
+			}
+			
+			
+			ninthConfig.put(i, nine);
+			tenthConfig.put(i, ten);
+			
+			
 			for(int k=0; k < appliancePowerProfile[0].length; k++) {
 				double aggregateSum = 0;
 				for(int j=0; j< appliancePowerProfile.length;j++) {
@@ -260,7 +281,7 @@ public class Server {
 		 
 		 Thread a = new Thread(new ServerRequest(args[0],serverObj));
 		 a.start();
-		 Thread b = new Thread(new ClientRequest(args[0],serverObj));
+		 Thread b = new Thread(new ClientRequest(args[0],serverObj,args[5]));
 		 b.start();
 		 
 	}
@@ -303,10 +324,40 @@ public class Server {
 			INDEX = minIndex;
 		}
 	}
+	
+	public void calculateVariance(int minIndex) {
+		
+		double sum = 0;
+		for(int i=0;i<24;i++) {
+			sum+=minimumAggregatePowerValue[i];
+		}
+
+		double average = sum/24;
+		
+		double[] val = new double[24];
+		
+		double sum1=0;
+		for(int i=0;i<24;i++) {
+			val[i]=Math.pow((minimumAggregatePowerValue[i]-average),2);
+			sum1+=val[i];
+		}
+		
+		
+		double var = sum1/24;
+		if(var < variance) {
+			variance = var;
+			VARIANCE_INDEX = minIndex;
+		}
+	}
 
 
-	public void fixConfiguration() {
-		appliancePowerProfile[9] = Ints.toArray(ninthConfig.get(INDEX));
-		appliancePowerProfile[10] = Ints.toArray(tenthConfig.get(INDEX));
+	public void fixConfiguration(String operation) {
+		if(operation.equals("variance")) {
+			appliancePowerProfile[9] = Ints.toArray(ninthConfig.get(VARIANCE_INDEX));
+			appliancePowerProfile[10] = Ints.toArray(tenthConfig.get(VARIANCE_INDEX));
+		} else if(operation.equals("par")) {
+			appliancePowerProfile[9] = Ints.toArray(ninthConfig.get(INDEX));
+			appliancePowerProfile[10] = Ints.toArray(tenthConfig.get(INDEX));
+		}
 	}
 }
