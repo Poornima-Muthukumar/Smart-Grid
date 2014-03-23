@@ -215,10 +215,10 @@ public class ClientRequest implements Runnable{
 			//based on the operation required either compute par or compute variance.
 			if(operation.equals("par")) {
 				server.calculatePAR(minIndex);
-				System.out.println(j + " " + server.PAR);
+				//System.out.println(j + " " + server.PAR);
 			} else if(operation.equals("variance")) {
 				server.calculateVariance(minIndex);
-				System.out.println(j + " " + server.variance);
+				//System.out.println(j + " " + server.variance);
 			}
 		}
 		
