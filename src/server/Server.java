@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.primitives.Ints;
 
@@ -55,11 +56,11 @@ public class Server {
 		 details = new HashMap<String, ArrayList<String>>();
 		 
 		 ArrayList<String> value1 = new ArrayList<String>(
-				    Arrays.asList("172.23.191.116","6789","false","0","0"));
+				    Arrays.asList("172.23.191.116","6789","false","0","0","0"));
 		 ArrayList<String> value2 = new ArrayList<String>(
-				    Arrays.asList("172.23.191.116","8888","false","0","0"));
+				    Arrays.asList("172.23.191.116","8888","false","0","0","0"));
 		 ArrayList<String> value3 = new ArrayList<String>(
-				    Arrays.asList("172.23.191.116","9999","false","0","0"));
+				    Arrays.asList("172.23.191.116","9999","false","0","0","0"));
 		 
 		 details.put("server1", value1);
 		 details.put("server2", value2);
@@ -281,6 +282,7 @@ public class Server {
 		 
 		 Thread a = new Thread(new ServerRequest(args[0],serverObj));
 		 a.start();
+		 
 		 Thread b = new Thread(new ClientRequest(args[0],serverObj,args[5]));
 		 b.start();
 		 
@@ -288,19 +290,46 @@ public class Server {
 
 
 	public void calcluateServerSpeed(String serverName) {
+
+		if(details.size() == 3) {
+			if(serverName.equals("server1")) {
+				details.get(serverName).set(4,Integer.toString(totalIteration/Integer.parseInt(details.get(serverName).get(3))));
+			}
+			else if(serverName.equals("server2")) {
+
+				int denom = Integer.parseInt(details.get(serverName).get(3)) * Integer.parseInt(details.get("server1").get(3));
+				details.get(serverName).set(4,Integer.toString(totalIteration/denom));
+			}
+			else if(serverName.equals("server3")) {
+				details.get(serverName).set(4,"1");
+			}	
+		} 
+		else if(details.size() == 2) {
+				
+				Set<String> name1 = details.keySet();
+					
+					char a = serverName.charAt(6);
+					int val = a -'0';
+					
+					for(String n:name1) {	
+						if(!n.equals(serverName)) {
+							char b = n.charAt(6);
+							int val1 = b -'0';
+							if(val1 > val) {
+								details.get(serverName).set(4,Integer.toString(1));
+							} else {
+								details.get(serverName).set(4,Integer.toString(totalIteration/Integer.parseInt(details.get(serverName).get(3))));
+							}
+						}
+					}
+					
+				
+						
+		}
 		
-		if(serverName.equals("server1")) {
-			details.get(serverName).set(4,Integer.toString(totalIteration/Integer.parseInt(details.get(serverName).get(3))));
-		}
-		else if(serverName.equals("server2")) {
-			
-			
-			int denom = Integer.parseInt(details.get(serverName).get(3)) * Integer.parseInt(details.get("server1").get(3));
-			details.get(serverName).set(4,Integer.toString(totalIteration/denom));
-		}
-		else if(serverName.equals("server3")) {
-			details.get(serverName).set(4,"1");
-		}
+		
+		
+		
 	}
 
 
