@@ -152,8 +152,6 @@ public void setUpConnection(String request)  {
 						 if(i==length) {
 							 i=0;
 						 }
-						 
-						 System.out.println("OH NOES");
 						 continue;
 					 }
 				 }
@@ -209,10 +207,8 @@ public void setUpConnection(String request)  {
 			
 			if(operation.equals("par")) {
 				server.calculatePAR(minIndex);
-				//System.out.println(j+" " +server.PAR);
 			} else if(operation.equals("variance")) {
 				server.calculateVariance(minIndex);
-				//System.out.println(j+" " +server.variance);
 			}
 			
 		}
@@ -315,7 +311,7 @@ public void setUpConnection(String request)  {
 	public void run() {
 			System.out.println("Hello from client thread!");  
         	
-			length = server.details.size() -1;
+			length = server.details.size()-1;
         	//Step1 - request iteration from other servers.
         	int selfCount = server.calculateIterationRound();
 			server.totalIteration*=selfCount;
@@ -323,9 +319,12 @@ public void setUpConnection(String request)  {
 		     
 		    // calcuate aggregate power profile for different appliance configuation for each server. 
 			server.calculateAggregatePowerProfile(selfCount);
-
+			
+			System.out.println("iteration count" + selfCount);
+			
 			setUpConnection("iteration");
 							
+			
 			//calculate individual speed.
 			server.calcluateServerSpeed(serverName);
 	       
@@ -339,6 +338,8 @@ public void setUpConnection(String request)  {
 	        calculateMinimumPowerProfile();
 	        
 	        server.fixConfiguration(operation);
+	        System.out.println(server.PAR);
+	        
 
 	}
 }

@@ -32,6 +32,9 @@ public class ServerProcessor implements Runnable {
 			
 	            try {
 					clientSentence = inFromClient.readLine();
+					if (clientSentence == null) {
+						return;
+					}
 				} catch (IOException e) {
 					System.out.println("Not able to read");
 					return;

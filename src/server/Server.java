@@ -92,10 +92,10 @@ public class Server {
 		
 		
 		
-		int dif1 = (endOfNinth > startOfNinth ) ? endOfNinth - startOfNinth : startOfNinth%12 + endOfNinth;
-		int dif2 = (endOfTenth > startOfTenth ) ? endOfTenth - startOfTenth : startOfTenth%12 + endOfTenth;
-		int iterationForNinth = (dif1 - sumOfNinth) + 2;
-		int iterationForTenth = (dif2 - sumOfTenth) + 2;
+		int dif1 = (endOfNinth > startOfNinth ) ? endOfNinth - startOfNinth : (endOfNinth+24) - startOfNinth;
+		int dif2 = (endOfTenth > startOfTenth ) ? endOfTenth - startOfTenth : (endOfTenth+24) - startOfTenth;
+		int iterationForNinth = (dif1 - sumOfNinth) + 1;
+		int iterationForTenth = (dif2 - sumOfTenth) + 1;
 
 		
 		int startIndexNinth = startOfNinth;
@@ -210,10 +210,10 @@ public class Server {
 		
 		int iteration = 1;
 		
-		int dif1 = (endOfNinth > startOfNinth ) ? endOfNinth - startOfNinth : startOfNinth%12 + endOfNinth;
-		int dif2 = (endOfTenth > startOfTenth ) ? endOfTenth - startOfTenth : startOfTenth%12 + endOfTenth;
-		iteration *= (dif1 - sumOfNinth) + 2;
-		iteration *= (dif2 - sumOfTenth) + 2;
+		int dif1 = (endOfNinth > startOfNinth ) ? endOfNinth - startOfNinth : (endOfNinth+24) - startOfNinth;
+		int dif2 = (endOfTenth > startOfTenth ) ? endOfTenth - startOfTenth : (endOfTenth+24) - startOfTenth;
+		iteration *= (dif1 - sumOfNinth) + 1;
+		iteration *= (dif2 - sumOfTenth) + 1;
 		
 		return iteration;
 	}
@@ -285,6 +285,15 @@ public class Server {
 		 
 		 Thread b = new Thread(new ClientRequest(args[0],serverObj,args[5]));
 		 b.start();
+		 
+		 serverObj.details.get("server1").set(0, args[6]);
+		 serverObj.details.get("server1").set(1, args[7]);
+		 
+		 serverObj.details.get("server2").set(0, args[8]);
+		 serverObj.details.get("server2").set(1, args[9]);
+		 
+		 serverObj.details.get("server3").set(0, args[10]);
+		 serverObj.details.get("server3").set(1, args[11]);
 		 
 	}
 
