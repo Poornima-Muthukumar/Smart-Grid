@@ -36,146 +36,146 @@ public class ClientRequest implements Runnable{
    }
 
 	
-public void setUpConnection(String request)  {
-		
-		
-	   Set<String> name = server.details.keySet();
-	   String[] nameArray = new String[name.size()-1];
-	   int j=0;
-	   for(String val: name) {
-		   
-		   if(!val.equals(serverName)) {
-		   nameArray[j] = val;
-		   j++;
-		   }
-	   }
+    public void setUpConnection(String request)  {
+            
+            
+        Set<String> name = server.details.keySet();
+        String[] nameArray = new String[name.size()-1];
+        int j=0;
+        for(String val: name) {
+            
+            if(!val.equals(serverName)) {
+            nameArray[j] = val;
+            j++;
+            }
+        }
 
-		int i = 0;
-		
-		while(true) {
-				
-				 if(server.details.get(nameArray[i]).get(2).equals("false")) {	
-					 Socket clientSocket = null; 
-					 try{
-						 
+            int i = 0;
+            
+            while(true) {
+                    
+                    if(server.details.get(nameArray[i]).get(2).equals("false")) {	
+                        Socket clientSocket = null; 
+                        try{
+                            
 
-						 clientSocket = clientSocketMap.get(nameArray[i]);
-						 DataOutputStream outToServer = outServer.get(nameArray[i]);
-						 BufferedReader inFromServer = inServer.get(nameArray[i]);
-						 
-						 if(clientSocket == null) {
-							 
-							 //error connecting
-							 clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
-							 clientSocketMap.put(nameArray[i], clientSocket);
-							 DataOutputStream a = new DataOutputStream(
-						                clientSocket.getOutputStream());
-						        
-							 BufferedReader b = 
-						                new BufferedReader(new InputStreamReader(
-						                    clientSocket.getInputStream()));
-							 
-							 inServer.put(nameArray[i], b);
-							 outServer.put(nameArray[i], a);
-							 outToServer = a;
-							 inFromServer = b;
+                            clientSocket = clientSocketMap.get(nameArray[i]);
+                            DataOutputStream outToServer = outServer.get(nameArray[i]);
+                            BufferedReader inFromServer = inServer.get(nameArray[i]);
+                            
+                            if(clientSocket == null) {
+                                
+                                //error connecting
+                                clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
+                                clientSocketMap.put(nameArray[i], clientSocket);
+                                DataOutputStream a = new DataOutputStream(
+                                            clientSocket.getOutputStream());
+                                    
+                                BufferedReader b = 
+                                            new BufferedReader(new InputStreamReader(
+                                                clientSocket.getInputStream()));
+                                
+                                inServer.put(nameArray[i], b);
+                                outServer.put(nameArray[i], a);
+                                outToServer = a;
+                                inFromServer = b;
 
-						 } 
+                            } 
 
-				        // clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
-				         server.details.get(nameArray[i]).set(2, "true");
-   
-				        if(request.equals("iteration")) {
+                            // clientSocket = new Socket(server.details.get(nameArray[i]).get(0), Integer.parseInt(server.details.get(nameArray[i]).get(1)));
+                            server.details.get(nameArray[i]).set(2, "true");
+    
+                            if(request.equals("iteration")) {
 
-					        //error case
-				        	try {
-				        		outToServer.writeBytes(request+"\n");
-				        	} catch(IOException e) {
-				        		System.out.println("SHUTTING DOWN");
-				       			System.exit(2);
-				        	}
-				        	
-				        	
-				        	String input = null;
-				        	//error case
-				        	
-				        	
-				        	
-				        	try {
-					         input = inFromServer.readLine();
-				        	} catch(IOException e) {
-				        		System.out.println("SHUTTING DOWN");
-				       			System.exit(2);
-				        	}
-				        	
-					        
-				        	String[] result = input.split(":");
-					        server.details.get(result[0]).set(3, result[1]);   
-					        server.totalIteration *= Integer.parseInt(result[1]);
-					       
-				        }
-				        
-				        else if(request.contains("request")){
+                                //error case
+                                try {
+                                    outToServer.writeBytes(request+"\n");
+                                } catch(IOException e) {
+                                    System.out.println("SHUTTING DOWN");
+                                    System.exit(2);
+                                }
+                                
+                                
+                                String input = null;
+                                //error case
+                                
+                                
+                                
+                                try {
+                                input = inFromServer.readLine();
+                                } catch(IOException e) {
+                                    System.out.println("SHUTTING DOWN");
+                                    System.exit(2);
+                                }
+                                
+                                
+                                String[] result = input.split(":");
+                                server.details.get(result[0]).set(3, result[1]);   
+                                server.totalIteration *= Integer.parseInt(result[1]);
+                            
+                            }
+                            
+                            else if(request.contains("request")){
 
-				        	//error
-				        	try{
-				        	outToServer.writeBytes(request+"\n");
-				        	}catch(IOException e) {
-				        		System.out.println("SHUTTING DOWN");
-				       			System.exit(2);
-				        	}
-				        	String input = null;
-				        	try{
-				        	//error
-				        	input = inFromServer.readLine();
-				        	} catch(IOException e) {
-				        		System.out.println("SHUTTING DOWN");
-				       			System.exit(2);
-				        	}
-				        	
-				        	String modifiedInput = input.substring(1, input.length()-1);
-				        	String[] result = modifiedInput.split(",");				        	
+                                //error
+                                try{
+                                outToServer.writeBytes(request+"\n");
+                                }catch(IOException e) {
+                                    System.out.println("SHUTTING DOWN");
+                                    System.exit(2);
+                                }
+                                String input = null;
+                                try{
+                                //error
+                                input = inFromServer.readLine();
+                                } catch(IOException e) {
+                                    System.out.println("SHUTTING DOWN");
+                                    System.exit(2);
+                                }
+                                
+                                String modifiedInput = input.substring(1, input.length()-1);
+                                String[] result = modifiedInput.split(",");				        	
 
-				        	if(server1Obj.isEmpty()) {
-				        		for(String d: result) {
-				        			server1Obj.add(Double.parseDouble(d)); 
-				        		}	
-				        	} else {
-				        		for(String d: result) {
-				        			server2Obj.add(Double.parseDouble(d)); 
-				        		}
-				        	}	
-				        }
-					}
-					 catch(IOException e) {
-						 i++;
-						 if(i==length) {
-							 i=0;
-						 }
-						 continue;
-					 }
-				 }
-				 i++;
-				 
-				 int state = 1;
-				 for(int p=0;p<nameArray.length;p++) {
-					 if(server.details.get(nameArray[p]).get(2).equals("true")) {
-						 state*=1;
-					 } else {
-						 state*=0;
-					 }
-					 
-				 }
-				 if(state==1) {
-					 break;
-				 }
-				 else {
-					 if(i==length) {
-						 i = 0;
-					 }
-				 }
-		}
-}
+                                if(server1Obj.isEmpty()) {
+                                    for(String d: result) {
+                                        server1Obj.add(Double.parseDouble(d)); 
+                                    }	
+                                } else {
+                                    for(String d: result) {
+                                        server2Obj.add(Double.parseDouble(d)); 
+                                    }
+                                }	
+                            }
+                        }
+                        catch(IOException e) {
+                            i++;
+                            if(i==length) {
+                                i=0;
+                            }
+                            continue;
+                        }
+                    }
+                    i++;
+                    
+                    int state = 1;
+                    for(int p=0;p<nameArray.length;p++) {
+                        if(server.details.get(nameArray[p]).get(2).equals("true")) {
+                            state*=1;
+                        } else {
+                            state*=0;
+                        }
+                        
+                    }
+                    if(state==1) {
+                        break;
+                    }
+                    else {
+                        if(i==length) {
+                            i = 0;
+                        }
+                    }
+            }
+    }
 
 	public void calculateMinimumPowerProfile()  {
 		
