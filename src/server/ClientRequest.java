@@ -110,8 +110,7 @@ public class ClientRequest implements Runnable{
                                 
                                 
                                 String[] result = input.split(":");
-                                server.details.get(result[0]).set(3, result[1]);  
-                                System.out.println(result[0]+" " +result[1]);
+                                server.details.get(result[0]).set(3, result[1]);                              
                                 server.totalIteration *= Integer.parseInt(result[1]);
                             
                             }
@@ -347,6 +346,15 @@ public class ClientRequest implements Runnable{
 	        calculateMinimumPowerProfile();
 	        
 	        server.fixConfiguration(operation);
-	      
+	        if(operation.equals("par")) {
+	        System.out.println("FINAL PAR "+server.PAR);
+	        System.out.println("APPLIANCE 10 CONFIGURATION" + Arrays.toString(server.aggregatePowerProfile[9]));
+	        System.out.println("APPLIANCE 11 CONFIGURATION" + Arrays.toString(server.aggregatePowerProfile[10]));
+	        }
+	        else if(operation.equals("variance")) {
+	        System.out.println("FINAL VAR "+server.variance);
+	        System.out.println("APPLIANCE 10 CONFIGURATION" + Arrays.toString(server.aggregatePowerProfile[9]));
+	        System.out.println("APPLIANCE 11 CONFIGURATION" + Arrays.toString(server.aggregatePowerProfile[10]));
+	        }
 	}
 }
