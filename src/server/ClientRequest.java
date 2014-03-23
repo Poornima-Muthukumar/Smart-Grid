@@ -217,7 +217,7 @@ public class ClientRequest implements Runnable{
 				//System.out.println(j + " " + server.PAR);
 			} else if(operation.equals("variance")) {
 				server.calculateVariance(minIndex);
-				//System.out.println(j + " " + server.variance);
+				System.out.println(j + " " + server.variance);
 			}
 		}
 		
@@ -348,13 +348,13 @@ public class ClientRequest implements Runnable{
 	        server.fixConfiguration(operation);
 	        if(operation.equals("par")) {
 	        System.out.println("FINAL PAR "+server.PAR);
-	        System.out.println("APPLIANCE 10 CONFIGURATION" + Arrays.toString(server.aggregatePowerProfile[9]));
-	        System.out.println("APPLIANCE 11 CONFIGURATION" + Arrays.toString(server.aggregatePowerProfile[10]));
+	        System.out.println("APPLIANCE 10 CONFIGURATION" + Arrays.toString(server.appliancePowerProfile[9]));
+	        System.out.println("APPLIANCE 11 CONFIGURATION" + Arrays.toString(server.appliancePowerProfile[10]));
 	        }
 	        else if(operation.equals("variance")) {
 	        System.out.println("FINAL VAR "+server.variance);
-	        System.out.println("APPLIANCE 10 CONFIGURATION" + Arrays.toString(server.aggregatePowerProfile[9]));
-	        System.out.println("APPLIANCE 11 CONFIGURATION" + Arrays.toString(server.aggregatePowerProfile[10]));
+	        System.out.println("APPLIANCE 10 CONFIGURATION" + Arrays.toString(server.appliancePowerProfile[9]));
+	        System.out.println("APPLIANCE 11 CONFIGURATION" + Arrays.toString(server.appliancePowerProfile[10]));
 	        }
 	}
 }
